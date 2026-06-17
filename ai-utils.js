@@ -151,16 +151,21 @@ window.AU = (function(){
     const toks = slug.replace(/\d+$/,'').split('-').map(t=>t.replace(/[^a-zçğıöşü]/g,'')).filter(t=>t.length>2 && !STOP.has(t));
     return { type:'Kategori', key:slug, tokens:toks };
   }
-  // bir llms sayfası için ilişkili ürün satırları (slug token eşleşmesi veya marka eşleşmesi)
+  // bir llms sayfası için ilişkili ürün satırları.
+  // Güvenilir yöntem: llms sayfası bir markaya çözümleniyorsa (marka filtreli kategori ya da
+  // /marka/ sayfası) → o markanın ÜRÜN sayfaları (breadcrumb doğrulamasıyla teyit edildi).
+  // Saf kategori sayfalarında (etek, pantolon...) → kategori token'ı; jenerik token'lar (spor,
+  // ayakkabı, kadın, erkek...) hariç tutulur, aksi halde aşırı geniş eşleşme oluşur.
+  const GENERIC_TOK = new Set(['spor','ayakkabi','ayakkabı','giyim','kadin','erkek','cocuk','unisex','aksesuar','canta','çanta']);
   function relatedProductRows(allRows, llmsLp, brandOf) {
+    if (brandOf) {
+      const bn = brandOf.toLowerCase().replace(/\s+/g,'');
+      return allRows.filter(r => r.ptype==='Ürün' && r.brand && r.brand.toLowerCase().replace(/\s+/g,'')===bn);
+    }
     const info = llmsTokens(llmsLp);
-    if (!info.tokens.length && !brandOf) return [];
-    return allRows.filter(r => {
-      if (r.ptype !== 'Ürün') return false;
-      const lpl = r.lp.toLowerCase();
-      if (info.type==='Marka' && brandOf && r.brand && r.brand.toLowerCase().replace(/\s+/g,'')===brandOf.toLowerCase().replace(/\s+/g,'')) return true;
-      return info.tokens.some(t => lpl.includes(t));
-    });
+    const specific = info.tokens.filter(t => !GENERIC_TOK.has(t) && t.length>3);
+    if (!specific.length) return [];
+    return allRows.filter(r => r.ptype==='Ürün' && specific.some(t => r.lp.toLowerCase().includes(t)));
   }
 
   return {

@@ -309,17 +309,22 @@
             y2:{position:'right',grid:{display:false},ticks:{color:'#1565C0'},title:{display:true,text:'diğer oturum',color:'#1565C0',font:{size:10}}}}},
         plugins: fi>=0?[{id:'fm',afterDraw(ch){const x=ch.scales.x.getPixelForValue(fi);const{top,bottom}=ch.chartArea;const c=ch.ctx;c.save();c.strokeStyle='rgba(241,91,42,.55)';c.lineWidth=1.5;c.setLineDash([5,4]);c.beginPath();c.moveTo(x,top);c.lineTo(x,bottom);c.stroke();c.setLineDash([]);c.fillStyle='rgba(241,91,42,.9)';c.font='600 10px Outfit,sans-serif';c.fillText('llms.txt ✦',x+5,top+12);c.restore();}}]:[] };
     };
-    // llms sayfaları + kategori→ürün keşfi
-    const discovery = useMemo(()=>{
+    // llms sayfaları + kategori/marka→ürün keşfi (marka-temelli, breadcrumb ile doğrulanmış)
+    const disc = useMemo(()=>{
       const pages = groupLP(llmsRows);
-      return pages.map(p=>{
+      const relLpAll = new Set();
+      const out = pages.map(p=>{
         const info = AU.llmsTokens(p.lp);
         const rel = AU.relatedProductRows(allRows, p.lp, p.brand);
         const relSess = rel.reduce((s,r)=>s+r.sessions,0);
         const relCount = new Set(rel.map(r=>r.lp)).size;
+        for (const r of rel) relLpAll.add(r.lp);
         return { ...p, llmsType:info.type, relSess, relCount };
       });
+      const uniqTotal = allRows.filter(r=>r.ptype==='Ürün' && relLpAll.has(r.lp)).reduce((s,r)=>s+r.sessions,0);
+      return { pages:out, uniqTotal };
     }, []);
+    const discovery = disc.pages;
     const filtered = useMemo(()=>{
       let d = discovery;
       if (typeFilter.length){ const s=new Set(typeFilter); d=d.filter(x=>s.has(x.llmsType)); }
@@ -334,21 +339,21 @@
       {key:'relCount',label:'İlişkili Ürün Sayısı',align:'right',render:r=>U.fmtFull(r.relCount)},
       {key:'revenue',label:'Direkt Ciro',align:'right',render:r=>AU.fmtTRY(r.revenue)},
     ];
-    const totalRel = discovery.reduce((s,x)=>s+x.relSess,0);
+    const totalRel = disc.uniqTotal;
     return h('div', null,
       h('div',{className:'scope-note'},
         h(Term,{t:'llms.txt'},'llms.txt'),' dosyası ',h('strong',null,'Şubat 2026'),'\'da eklenmiştir; "Önemli Sayfalar" altında ',h('strong',null,AU.META.llmsPathCount+' sayfa'),' tanımlıdır, bunlardan ',h('strong',null,AU.META.llmsInData+' tanesi'),' AI trafiği verisinde gözlemlenmektedir. ',
-        'Bu sayfalar ağırlıkla kategori/marka niteliğinde olduğundan, aşağıda hem doğrudan oturum hem de ',h('strong',null,'bu kategori/markalardaki ürünlere gelen ilişkili trafik (keşif)'),' birlikte sunulmaktadır. İlişkili eşleştirme slug ve marka temelli yaklaşık bir yöntemdir; bir ürün birden fazla kategoriyle eşleşebildiğinden bu değer örtüşme içerebilir ve üst sınır olarak değerlendirilmelidir.'),
+        'Bu sayfalar ağırlıkla kategori/marka niteliğinde olduğundan, aşağıda hem doğrudan oturum hem de ',h('strong',null,'bu kategori/markalardaki ürünlere gelen ilişkili trafik (keşif)'),' birlikte sunulmaktadır. İlişkili eşleştirme ağırlıkla ',h('strong',null,'marka temellidir'),' (ör. llms.txt\'deki Adidas filtreli sayfa → AI trafiği alan Adidas ürün sayfaları); bağlılık örnek sayfalarda ',h('strong',null,'breadcrumb ile teyit edilmiştir'),'. Toplam değer örtüşmesiz (benzersiz ürün) hesaplanır.'),
       h(KpiStrip,{cols:4, items:[
         {label:'llms.txt · Şubat öncesi',value:U.fmtFull(preL),color:'#F15B2A',sub:'doğrudan oturum'},
         {label:'llms.txt · Şubat ve sonrası',value:U.fmtFull(postL),color:'#F15B2A',sub:'doğrudan oturum'},
-        {label:'İlişkili ürün keşfi',value:U.fmtFull(totalRel),color:'#2E7D32',sub:'kategori/marka ürün oturumu (yaklaşık, örtüşmeli)'},
+        {label:'İlişkili ürün keşfi',value:U.fmtFull(totalRel),color:'#2E7D32',sub:'marka/kategori ürün oturumu (örtüşmesiz)'},
         {label:'Diğer · Şubat sonrası',value:U.fmtFull(postO),color:'#1565C0',sub:'llms.txt dışı oturum'},
       ]}),
       h(ExportSection,{id:'sec-llms-chart',title:'llms.txt Sayfaları vs Diğer — Aylık Oturum',desc:'Çift eksen: sol llms.txt sayfaları, sağ diğer sayfalar. Kesikli çizgi Şubat 2026 (llms.txt eklendi).',pngName:'ozdilekteyim-ai-llms-etki'},
         h(ChartCanvas,{buildConfig:buildLine,deps:[],height:340})),
       h('div',{className:'insight-strip',style:{margin:'4px 0 16px'}},h('span',{className:'arrow'},'➜'),
-        h('span',null,'llms.txt sayfalarının doğrudan oturumu sınırlı seyretse de, bu kategori ve markalarla ilişkilendirilebilen ürün sayfalarına gelen ',h('strong',null,'trafik daha geniş bir hacme (yaklaşık '+U.fmtFull(totalRel)+' oturum, örtüşmeli)'),' işaret etmektedir; kullanıcıların kategori sayfası yerine doğrudan ilgili ürün sayfalarına ulaşmış olabileceği değerlendirilebilir.')),
+        h('span',null,'llms.txt sayfalarının doğrudan oturumu sınırlı seyretse de, bu marka ve kategorilerin ürün sayfalarına gelen ',h('strong',null,'ilişkili trafik '+U.fmtFull(totalRel)+' oturum (örtüşmesiz)'),' düzeyindedir; kullanıcıların kategori sayfası yerine doğrudan ilgili ürün sayfalarına ulaşmış olabileceği değerlendirilebilir.')),
       h('div',{className:'filter-row'},
         h(SearchInput,{value:search,onChange:setSearch,placeholder:'llms.txt sayfası ara…'}),
         h(MultiSelect,{label:'tür',options:['Marka','Kategori'],selected:typeFilter,onChange:setTypeFilter,width:160})),

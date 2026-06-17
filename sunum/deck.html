@@ -134,8 +134,10 @@
         </div>
       </div>
       <ul class="insight-list" style="padding:0 60px;margin-top:0;column-count:2;column-gap:40px;">
-        <li>Kasım'dan Mayıs'a oturum hacminde <b class="pos">genel bir yükseliş</b> eğilimi gözlemlenmektedir.</li>
+        <li><b class="acc">Kasım</b> alışveriş kampanya dönemiyle (Efsane Cuma) öne çıkmakta; ₺139K ile dönemin <b class="acc">en yüksek cirosu</b> bu ayda gözlemlenmektedir.</li>
+        <li>Kasım'dan Mayıs'a oturum hacminde <b class="pos">genel bir yükseliş</b> eğilimi sürmektedir; <b class="acc">Mayıs</b> ayı yıl ortası indirim dönemiyle ikinci bir tepe oluşturmaktadır.</li>
         <li>Haziran <b class="acc">kısmi dönem</b> olduğundan ay sonu değerleri farklılaşabilir; karşılaştırma buna göre yorumlanabilir.</li>
+        <li>Kampanya aylarında ciro artışının oturumdan daha belirgin olması, bu dönemlerde <b class="acc">dönüşüm eğiliminin</b> güçlendiğine işaret edebilir.</li>
       </ul>
       <div class="logo-bl"></div>
       <div class="source-pill">Kaynak: GA4 · AI referral</div>
@@ -353,14 +355,14 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-top:26px;align-items:center;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
             <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v" style="font-size:40px;">37 → 40</div><div class="l">llms.txt sayfaları · doğrudan oturum (Şubat öncesi → sonrası)</div></div>
-            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:40px;">~38K</div><div class="l">İlişkili ürün keşfi · oturum (yaklaşık, örtüşmeli)</div></div>
+            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:40px;">12.359</div><div class="l">İlişkili ürün keşfi · oturum (örtüşmesiz, marka/breadcrumb doğrulamalı)</div></div>
             <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:40px;">13.930</div><div class="l">Diğer sayfalar · Şubat öncesi</div></div>
             <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:40px;">24.230</div><div class="l">Diğer sayfalar · Şubat sonrası</div></div>
           </div>
           <ul class="insight-list">
             <li>llms.txt sayfaları ağırlıkla <b class="acc">kategori/marka</b> niteliğindedir; bu sayfaların doğrudan AI oturumu bu dönemde sınırlı seyretmektedir (<b class="acc">37 → 40</b>).</li>
-            <li>Buna karşın bu kategori ve markalardaki <b class="acc">ürünlere gelen ilişkili trafik daha geniş bir hacme</b> (yaklaşık 38K oturum, örtüşmeli) işaret etmektedir; kullanıcıların kategori yerine doğrudan ilgili ürün sayfalarına ulaşmış olabileceği değerlendirilebilir.</li>
-            <li>llms.txt etkisinin daha sağlıklı ölçülebilmesi için kapsamın <b class="acc">öne çıkan ürün sayfalarıyla</b> genişletilmesi ve takibin sürdürülmesi değerlendirilebilir.</li>
+            <li>Buna karşın bu marka ve kategorilerin <b class="acc">ürün sayfalarına gelen ilişkili trafik 12.359 oturum</b> (örtüşmesiz) düzeyindedir; kullanıcıların kategori yerine doğrudan ilgili ürün sayfalarına ulaşmış olabileceği değerlendirilebilir.</li>
+            <li>İlişki <b class="acc">marka eşleşmesi</b> ile kurulmuş, örnek sayfalarda <b class="acc">breadcrumb ile teyit</b> edilmiştir (sonraki slayt).</li>
           </ul>
         </div>
       </div>
@@ -369,17 +371,56 @@
     </div>
   </section>
 
+  <!-- 12b llms.txt ürün keşfi (doğrulanmış) -->
+  <section data-screen-label="llms ürün keşfi">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Fırsat & llms.txt</span><span class="sep">|</span><span class="title">Ürün keşfi · doğrulanmış</span></div>
+      <div style="padding:80px 60px 60px;">
+        <h1 style="font-size:32px;">llms.txt sayfaları nasıl <span class="hl">ürün keşfine</span> dönüşüyor?</h1>
+        <p style="font-size:13px;color:var(--ink-2);margin-top:8px;max-width:880px;">İlişki <b>marka eşleşmesi</b> ile kurulmuştur: llms.txt'deki marka filtreli kategori sayfası (ör. Adidas) ile o markanın AI trafiği alan ürün sayfaları. Bağlılık ilgili sayfalarda <b>breadcrumb ile teyit</b> edilmiştir.</p>
+        <div style="display:grid;grid-template-columns:54% 1fr;gap:34px;margin-top:22px;">
+          <table class="ptbl">
+            <thead><tr><th>Marka (llms.txt)</th><th class="n">llms sayfa</th><th class="n">AI trafikli ürün</th><th class="n">İlişkili oturum</th></tr></thead>
+            <tbody>
+              <tr><td>Mavi</td><td class="n">4</td><td class="n">1.052</td><td class="n" style="background:#C8E6C9;color:#2E7D32;font-family:var(--font-display);font-weight:700;">1.254</td></tr>
+              <tr><td>Adidas</td><td class="n">3</td><td class="n">789</td><td class="n" style="background:#C8E6C9;color:#2E7D32;font-family:var(--font-display);font-weight:700;">1.224</td></tr>
+              <tr><td>Skechers</td><td class="n">3</td><td class="n">559</td><td class="n">862</td></tr>
+              <tr><td>Pierre Cardin</td><td class="n">1</td><td class="n">546</td><td class="n">605</td></tr>
+              <tr><td>Calvin Klein</td><td class="n">1</td><td class="n">417</td><td class="n">583</td></tr>
+              <tr><td>Guess</td><td class="n">2</td><td class="n">466</td><td class="n">530</td></tr>
+            </tbody>
+          </table>
+          <div style="background:var(--mint);border-radius:16px;padding:20px 22px;">
+            <div style="font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--teal);margin-bottom:10px;">Örnek doğrulama · breadcrumb</div>
+            <div style="font-size:12.5px;color:var(--ink-2);line-height:1.6;">
+              <div style="margin-bottom:9px;"><b>llms.txt sayfası:</b><br>/magaza/adidas-erkek-spor-ayakkabi<br><span style="color:var(--ink-3);">breadcrumb: Ana Sayfa › Erkek › Ayakkabı › Spor · marka: Adidas</span></div>
+              <div style="margin-bottom:9px;"><b>İlişkili ürün (örnek):</b><br>Adidas Duramo Speed Erkek Ayakkabı<br><span style="color:var(--ink-3);">breadcrumb: Ana Sayfa › Spor &amp; Outdoor › Spor Ayakkabıları › Koşu Ayakkabıları · marka: Adidas</span></div>
+              <div style="border-top:1px solid var(--line);padding-top:9px;"><span class="accent-teal" style="font-weight:700;">789 Adidas ürünü</span>, toplam <span class="accent-teal" style="font-weight:700;">1.224 oturum</span> bu marka kapsamında AI trafiği almıştır.</div>
+            </div>
+          </div>
+        </div>
+        <ul class="insight-list" style="margin-top:18px;">
+          <li>Toplam <b class="acc">12.359 örtüşmesiz oturum</b> llms.txt'deki marka/kategorilerin ürün sayfalarına ulaşmıştır; bu, llms.txt yapısının ürün keşfini beslediğine dair gözlemlenebilir bir sinyaldir.</li>
+        </ul>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · llms.txt · sayfa breadcrumb</div>
+    </div>
+  </section>
+
   <!-- 13 Sonraki adımlar -->
   <section data-screen-label="13 Sonraki adımlar">
     <div class="slide">
       <div class="breadcrumb-top"><span class="section">Sonraki Adımlar</span><span class="sep">|</span><span class="title">Değerlendirilebilir alanlar</span></div>
       <div style="padding:84px 60px 60px;">
-        <h1 style="font-size:34px;">Sonraki <span class="hl">adımlar</span></h1>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px;">
-          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">01</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">Dönüşüm akışı</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">Yüksek AI oturumu alan ürün sayfalarında fiyat, stok ve içerik bütünlüğünün değerlendirilmesi.</p></div>
-          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">02</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">llms.txt kapsamı</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">Öne çıkan ürün sayfalarının llms.txt kapsamına eklenmesi ve etkisinin zaman içinde takibi.</p></div>
-          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">03</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">Arama hacmi & sezonsallık</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">İlgili kategori ve markaların güncel arama hacmiyle zenginleştirilmesi (opsiyonel aşama).</p></div>
-          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">04</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">Sürekli takip</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">Aylık AI trafik raporunun düzenli güncellenmesi ve kanal performansının izlenmesi.</p></div>
+        <h1 style="font-size:32px;">Sonraki <span class="hl">adımlar</span></h1>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:22px;">
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:38px;color:var(--coral);opacity:.2;">01</div><div style="font-family:var(--font-display);font-weight:700;font-size:16px;margin-top:-6px;">Dönüşüm akışı</div><p style="font-size:12px;color:var(--ink-2);margin-top:5px;">Yüksek AI oturumu alan ürün sayfalarında fiyat, stok ve içerik bütünlüğünün değerlendirilmesi.</p></div>
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:38px;color:var(--coral);opacity:.2;">02</div><div style="font-family:var(--font-display);font-weight:700;font-size:16px;margin-top:-6px;">llms.txt kapsamı</div><p style="font-size:12px;color:var(--ink-2);margin-top:5px;">Öne çıkan ürün sayfalarının llms.txt kapsamına eklenmesi ve etkisinin zaman içinde takibi.</p></div>
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:38px;color:var(--coral);opacity:.2;">03</div><div style="font-family:var(--font-display);font-weight:700;font-size:16px;margin-top:-6px;">llms-full.txt &amp; dinamik üretim</div><p style="font-size:12px;color:var(--ink-2);margin-top:5px;">Google'ın optimizasyon dokümanlarına llms.txt'yi eklemesiyle bu yapı değer kazanmaktadır; site için kapsamlı bir <b>llms-full.txt</b>'nin dinamik üretilmesi değerlendirilebilir.</p></div>
+          <div class="col-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><div style="font-family:var(--font-display);font-weight:700;font-size:38px;color:var(--coral);opacity:.2;">04</div><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:var(--gold);color:#fff;border-radius:999px;padding:3px 8px;">in progress</span></div><div style="font-family:var(--font-display);font-weight:700;font-size:16px;margin-top:-6px;">GEO içerik · kategori &amp; ürün</div><p style="font-size:12px;color:var(--ink-2);margin-top:5px;">Hero ürün ve öne çıkan kategorilere GEO odaklı içerik. Kategori içerikleri üretiliyor <b>(in progress)</b>; ürün içerikleri planlandı.</p></div>
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:38px;color:var(--coral);opacity:.2;">05</div><div style="font-family:var(--font-display);font-weight:700;font-size:16px;margin-top:-6px;">Arama hacmi & sezonsallık</div><p style="font-size:12px;color:var(--ink-2);margin-top:5px;">İlgili kategori ve markaların güncel arama hacmiyle zenginleştirilmesi (opsiyonel aşama).</p></div>
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:38px;color:var(--coral);opacity:.2;">06</div><div style="font-family:var(--font-display);font-weight:700;font-size:16px;margin-top:-6px;">Sürekli takip</div><p style="font-size:12px;color:var(--ink-2);margin-top:5px;">Aylık AI trafik raporunun düzenli güncellenmesi ve kanal performansının izlenmesi.</p></div>
         </div>
       </div>
       <div class="logo-bl"></div>
