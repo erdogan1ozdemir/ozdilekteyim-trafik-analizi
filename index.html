@@ -232,6 +232,24 @@
   /* "daha fazla" satır kontrolü */
   .tbl-more { text-align:center; margin-top:12px; }
 
+  /* Terim tooltip'i — anında, stilize, tema uyumlu */
+  .term { position:relative; cursor:help; }
+  .term[data-tip]:not([data-tip=""]):hover::after, .term[data-tip]:not([data-tip=""]):focus-visible::after {
+    content:attr(data-tip); position:absolute; left:0; bottom:calc(100% + 8px);
+    background:var(--bg-card); color:var(--ink); border:1px solid var(--line);
+    font-family:'Outfit', sans-serif; font-size:11.5px; font-weight:500; line-height:1.45; letter-spacing:normal;
+    padding:9px 12px; border-radius:10px; width:max-content; max-width:280px; white-space:normal; text-align:left;
+    box-shadow:var(--shadow-pop); z-index:400; pointer-events:none; }
+
+  /* Bölüm özeti kartı — satırlar kaydırılabilir (≈5 satır görünür, 15'e kadar) */
+  .summary-card .sc-scroll { max-height:168px; overflow-y:auto; overscroll-behavior:contain; }
+  .summary-card .sc-scroll::-webkit-scrollbar { width:6px; }
+  .summary-card .sc-scroll::-webkit-scrollbar-thumb { background:var(--line); border-radius:3px; }
+
+  /* Heat tablosu dikey scroll'da sticky başlık zemini opak kalsın */
+  .heatmap-scroll .heatmap .hm-head { background:var(--bg-card); z-index:2; }
+  .heatmap-scroll .heatmap .hm-corner { z-index:3; }
+
   /* ===== v5: mobil / responsive ===== */
   @media (max-width: 720px) {
     .content { padding:14px 12px 70px; }

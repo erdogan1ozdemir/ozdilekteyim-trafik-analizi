@@ -19,7 +19,7 @@
     'Landing Page':'Kullanıcının siteye giriş yaptığı ilk sayfa.',
     'transaction':'Tamamlanan satın alma işlemi.',
   };
-  function Term({t, children}) { return h('span',{className:'term','data-term':t,title:GLOSSARY[t]||''}, children||t); }
+  function Term({t, children}) { const tip=GLOSSARY[t]||''; return h('span',{className:'term','data-term':t,'data-tip':tip,tabIndex:0,'aria-label':tip}, children||t); }
 
   function Section({id, title, desc, children, tools, innerRef}) {
     return h('section', { id, ref:innerRef, className:'ai-section card' },
@@ -159,7 +159,7 @@
   }
 
   // ——— Isı haritası tablosu (Sezon Takvimi stili): satır × ay, hmColor; tıklanır ———
-  function HeatTable({rows, months, onRowClick, deltaKey, deltaLabel}) {
+  function HeatTable({rows, months, onRowClick, deltaKey, deltaLabel, maxHeight}) {
     const lbls = months.map(AU.trMonth);
     const cols = `200px repeat(${months.length}, minmax(40px,1fr))` + (deltaKey?' 76px':'');
     const grid = [];
@@ -176,7 +176,7 @@
       if (deltaKey) grid.push(h('div',{key:'d'+ri, className:'hm-delta', onClick:onRowClick?()=>onRowClick(row):undefined, style:onRowClick?{cursor:'pointer'}:{}},
         h('span',{className: row[deltaKey]>0?'delta-pos':row[deltaKey]<0?'delta-neg':'delta-neu'}, (row[deltaKey]>0?'+':'')+U.fmtNum(row[deltaKey]))));
     });
-    return h('div',{className:'heatmap-scroll'}, h('div',{className:'heatmap', style:{gridTemplateColumns:cols}}, grid));
+    return h('div',{className:'heatmap-scroll', style: maxHeight?{maxHeight:maxHeight+'px', overflowY:'auto'}:undefined}, h('div',{className:'heatmap', style:{gridTemplateColumns:cols}}, grid));
   }
 
   // ——— Marka donut + çok-metrikli liste ———
@@ -306,13 +306,24 @@
       ) : null,
       h('div', { style:{marginTop:totals?'10px':'0'} },
         h('div',{className:'sc-row', style:{fontSize:'9.5px', fontWeight:700, textTransform:'uppercase', letterSpacing:'.04em', color:'var(--ink-3)', borderBottom:'1px solid var(--line)'}},
-          h('span',{className:'nm'}, ''), h('span',{style:{display:'flex',gap:'14px'}}, h('span',{style:{minWidth:'44px',textAlign:'right'}},'Otr'), h('span',{style:{minWidth:'52px',textAlign:'right'}},'Ciro'), h('span',{style:{minWidth:'26px',textAlign:'right'}},'Tx'))),
-        rows.map((r,i)=>h('div',{key:i, className:'sc-row'},
-          h('span',{className:'nm'}, r.nm),
-          h('span',{style:{display:'flex',gap:'14px',fontFamily:'Bricolage Grotesque',fontWeight:600,fontVariantNumeric:'tabular-nums'}},
-            h('span',{style:{minWidth:'44px',textAlign:'right',color:'var(--ink)'}}, U.fmtNum(r.sessions)),
-            h('span',{style:{minWidth:'52px',textAlign:'right',color:'var(--ink-2)'}}, AU.fmtTRY(r.revenue,{compact:true})),
-            h('span',{style:{minWidth:'26px',textAlign:'right',color:'var(--ink-2)'}}, U.fmtNum(r.tx)))))
+          h('span',{className:'nm'}, ''),
+          h('span',{style:{display:'flex',gap:'14px'}},
+            h('span',{style:{minWidth:'44px',textAlign:'right'}},'Otr'),
+            h('span',{style:{minWidth:'52px',textAlign:'right'}},'Ciro'),
+            h('span',{style:{minWidth:'26px',textAlign:'right'}},'Tx')
+          )
+        ),
+        h('div', { className:'sc-scroll' },
+          rows.map((r,i)=>h('div',{key:i, className:'sc-row'},
+            h('span',{className:'nm'}, r.nm),
+            h('span',{style:{display:'flex',gap:'14px',fontFamily:'Bricolage Grotesque',fontWeight:600,fontVariantNumeric:'tabular-nums'}},
+              h('span',{style:{minWidth:'44px',textAlign:'right',color:'var(--ink)'}}, U.fmtNum(r.sessions)),
+              h('span',{style:{minWidth:'52px',textAlign:'right',color:'var(--ink-2)'}}, AU.fmtTRY(r.revenue,{compact:true})),
+              h('span',{style:{minWidth:'26px',textAlign:'right',color:'var(--ink-2)'}}, U.fmtNum(r.tx))
+            )
+          ))
+        ),
+        rows.length>5 ? h('div',{style:{fontSize:'10px',color:'var(--ink-3)',textAlign:'center',marginTop:'4px'}}, '↕ '+rows.length+' satır · kaydırın') : null
       )
     );
   }

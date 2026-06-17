@@ -73,15 +73,19 @@
     ];
     const sess = AU.monthlySeries(allRows,'sessions');
     const peak = AU.MONTHS[sess.indexOf(Math.max(...sess))];
-    // mini-özet kartları (çok metrikli)
-    const lpTop = groupLP(rows).sort((a,b)=>b.sessions-a.sessions).slice(0,4);
-    const ptAll = AU.groupBy(rows,r=>r.ptype); const ptTop=[...ptAll].sort((a,b)=>b.sessions-a.sessions).slice(0,4);
-    const brAll = AU.groupBy(rows.filter(r=>r.brand),r=>r.brand); const brTop=[...brAll].sort((a,b)=>b.sessions-a.sessions).slice(0,4);
+    // bölüm özetleri — kendi filtresine (arama/tip/marka) göre; ilk 5 görünür, 15'e kadar scroll
+    const [filters, setFilters] = useState({ search:'', ptypes:[], brands:[] });
+    const frows = useMemo(()=>AU.applyFilters(rows, filters), [rows, filters]);
+    const N = 15;
+    const lpTop = groupLP(frows).sort((a,b)=>b.sessions-a.sessions).slice(0,N);
+    const ptTop = AU.groupBy(frows,r=>r.ptype).sort((a,b)=>b.sessions-a.sessions).slice(0,N);
+    const brAll = AU.groupBy(frows.filter(r=>r.brand),r=>r.brand); const brTop=[...brAll].sort((a,b)=>b.sessions-a.sessions).slice(0,N);
     const brTot = brAll.reduce((a,g)=>({sessions:a.sessions+g.sessions,revenue:a.revenue+g.revenue,tx:a.tx+g.tx}),{sessions:0,revenue:0,tx:0});
-    const firsat = groupLP(rows).filter(x=>x.tx===0 && x.ptype!=='Sepet/Checkout' && x.ptype!=='Hesap' && x.sessions>=5).sort((a,b)=>b.sessions-a.sessions);
+    const ftot = AU.totals(frows);
+    const firsat = groupLP(frows).filter(x=>x.tx===0 && x.ptype!=='Sepet/Checkout' && x.ptype!=='Hesap' && x.sessions>=5).sort((a,b)=>b.sessions-a.sessions);
     const fTot = firsat.reduce((a,g)=>({sessions:a.sessions+g.sessions,revenue:a.revenue+g.revenue,tx:a.tx+g.tx}),{sessions:0,revenue:0,tx:0});
-    const llmsTop = groupLP(rows.filter(r=>r.inLlms)).sort((a,b)=>b.sessions-a.sessions).slice(0,4);
-    const llmsT = AU.totals(rows.filter(r=>r.inLlms));
+    const llmsTop = groupLP(frows.filter(r=>r.inLlms)).sort((a,b)=>b.sessions-a.sessions).slice(0,N);
+    const llmsT = AU.totals(frows.filter(r=>r.inLlms));
     const mk = (g)=>({nm:g.key||AU.lpLabel(g.lp), sessions:g.sessions, revenue:g.revenue, tx:g.tx});
 
     // aylık yükselen markalar (ısı haritası)
@@ -104,12 +108,14 @@
           ' (az miktarda Perplexity ve Copilot dahil). Tutarlar ', h('strong',null,'₺'), ' cinsindendir. ',
           (AU.META.partialMonths||[]).length? ('İşaretli ay(lar) (*) kısmi dönem içerir: '+AU.META.partialMonths.map(AU.trMonth).join(', ')+'.'):'')
       ),
-      h('div', { style:{margin:'4px 0 14px', fontSize:'13px', fontWeight:700, color:'var(--ink-2)'} }, 'Bölüm özetleri'),
+      h('div', { style:{margin:'2px 0 12px'} }, h(FilterBar, { filters, setFilters })),
+      h('div', { style:{margin:'4px 0 14px', fontSize:'13px', fontWeight:700, color:'var(--ink-2)'} }, 'Bölüm özetleri',
+        h('span',{style:{fontWeight:500,color:'var(--ink-3)',fontSize:'12px',marginLeft:'8px'}},'· her kart 15 satıra kadar, kaydırılabilir')),
       h('div', { className:'summary-grid' },
-        h(SummaryCard, { title:'Landing Page', goLabel:'Landing Page', onGo:()=>navTo('lp'), totals:t, rows:lpTop.map(mk) }),
-        h(SummaryCard, { title:'Sayfa Tipi', goLabel:'Sayfa Tipi', onGo:()=>navTo('ptype'), totals:t, rows:ptTop.map(mk) }),
+        h(SummaryCard, { title:'Landing Page', goLabel:'Landing Page', onGo:()=>navTo('lp'), totals:ftot, rows:lpTop.map(mk) }),
+        h(SummaryCard, { title:'Sayfa Tipi', goLabel:'Sayfa Tipi', onGo:()=>navTo('ptype'), totals:ftot, rows:ptTop.map(mk) }),
         h(SummaryCard, { title:'Marka & Ürün', goLabel:'Marka & Ürün', onGo:()=>navTo('brand'), totals:brTot, rows:brTop.map(mk) }),
-        h(SummaryCard, { title:'Dönüşüm Fırsatı', goLabel:'Dönüşüm Fırsatı', onGo:()=>navTo('noconv'), totals:fTot, rows:firsat.slice(0,4).map(mk) }),
+        h(SummaryCard, { title:'Dönüşüm Fırsatı', goLabel:'Dönüşüm Fırsatı', onGo:()=>navTo('noconv'), totals:fTot, rows:firsat.slice(0,N).map(mk) }),
         h(SummaryCard, { title:'llms.txt sayfaları', goLabel:'llms.txt Etkisi', onGo:()=>navTo('llms'), totals:{sessions:llmsT.sessions,revenue:llmsT.revenue,tx:llmsT.tx}, rows:llmsTop.map(mk) })
       ),
       // aylık yükselen markalar — ısı haritası (tıklanır)
@@ -278,7 +284,7 @@
         desc:'Tüm markaların aydan aya '+AU.METRICS[metric].short.toLowerCase()+' yoğunluğu (kırmızı düşük → yeşil yüksek, satır içi ölçek). Δ dönemin ilk/ikinci yarı farkıdır. Bir markaya tıklayarak detayını (aylık akış + sayfalar) açabilirsiniz. Metrik üstteki butonlardan değişir.',
         pngName:'ozdilekteyim-ai-marka-sezon',
         csv:{rows:heatRows,name:'marka-sezon-takvimi',headers:[{label:'Marka',get:r=>r.label}].concat(AU.MONTHS.map((m,i)=>({label:AU.trMonth(m),get:r=>Math.round(r.values[i])}))).concat([{label:'Δ oturum',get:r=>Math.round(r.diff)}])}},
-        h(C.HeatTable,{rows:heatRows, months:AU.MONTHS, deltaKey:'diff', deltaLabel:'Δ otr', onRowClick:r=>setModalBrand(r.key)})),
+        h(C.HeatTable,{rows:heatRows, months:AU.MONTHS, deltaKey:'diff', deltaLabel:'Δ otr', maxHeight:430, onRowClick:r=>setModalBrand(r.key)})),
       modalBrand ? h(BrandModalView,{brand:modalBrand, allRows:AU.ROWS, onClose:()=>setModalBrand(null)}) : null
     );
   }
