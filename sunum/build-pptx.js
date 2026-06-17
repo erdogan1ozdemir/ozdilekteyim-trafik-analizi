@@ -110,10 +110,10 @@ logoTeal(s); sourcePill(s,'Kaynak: GA4 · AI referral');
 // 09 MARKA (bar + liste)
 s=p.addSlide(); s.background={color:WHITE}; breadcrumb(s,'Trafik Nereye Gidiyor','Marka merceği');
 title(s,[{text:'Marka '},hl('merceği')]);
-s.addChart(p.ChartType.bar,[{name:'Oturum',labels:['Özdilek','Mavi','Adidas','Skechers','Philips','Pierre Cardin','Calvin Klein','Guess','Koton','Merrell'],values:[1823,1299,1232,867,847,610,588,542,472,454]}],
+s.addChart(p.ChartType.bar,[{name:'Oturum',labels:['Özdilek','Adidas','Mavi','Skechers','Philips','Pierre Cardin','Calvin Klein','Guess','Koton','Merrell'],values:[1818,1229,1175,864,846,610,585,536,471,454]}],
   {x:0.5,y:1.7,w:7.2,h:4.8,barDir:'bar',chartColors:[CORAL],showValue:true,dataLabelColor:INK,dataLabelFontFace:BF,dataLabelFontSize:10,catAxisLabelColor:INK,catAxisLabelFontFace:BF,valAxisHidden:true,showLegend:false,valGridLine:{style:'none'}});
 const brTbl=[[{text:'Marka',options:{bold:true}},{text:'Oturum',options:{bold:true,align:'right'}},{text:'Ciro',options:{bold:true,align:'right'}},{text:'Tx',options:{bold:true,align:'right'}}]];
-[['Özdilek','1.823','₺41,7K','12'],['Mavi','1.299','₺13,9K','11'],['Adidas','1.232','₺34,5K','13'],['Skechers','867','₺39,8K','9'],['Philips','847','₺12,7K','2'],['Pierre Cardin','610','₺22,5K','6'],['Calvin Klein','588','₺19,7K','4'],['Guess','542','₺6,8K','2'],['Koton','472','₺4,8K','4'],['Merrell','454','₺22,6K','4']].forEach(r=>brTbl.push([r[0],{text:r[1],options:{align:'right'}},{text:r[2],options:{align:'right'}},{text:r[3],options:{align:'right'}}]));
+[['Özdilek','1.818','₺41,7K','12'],['Adidas','1.229','₺34,5K','13'],['Mavi','1.175','₺13,9K','11'],['Skechers','864','₺39,8K','9'],['Philips','846','₺12,7K','2'],['Pierre Cardin','610','₺22,5K','6'],['Calvin Klein','585','₺19,7K','4'],['Guess','536','₺6,8K','2'],['Koton','471','₺4,8K','4'],['Merrell','454','₺22,6K','4']].forEach(r=>brTbl.push([r[0],{text:r[1],options:{align:'right'}},{text:r[2],options:{align:'right'}},{text:r[3],options:{align:'right'}}]));
 s.addTable(brTbl,{x:8.0,y:1.7,w:4.8,colW:[1.7,1.1,1.2,0.8],fontFace:BF,fontSize:10.5,color:INK,rowH:0.36,border:{type:'solid',color:LINE,pt:0.5},valign:'middle'});
 logoTeal(s); sourcePill(s,'Kaynak: GA4 · AI referral');
 
@@ -122,7 +122,7 @@ s=p.addSlide(); s.background={color:WHITE}; breadcrumb(s,'Trafik Nereye Gidiyor'
 title(s,[{text:'Zaman içinde '},hl('yükselenler')]);
 s.addText('Dönemin ilk yarısı (Kas–Şub) ile ikinci yarısı (Mar–Haz) arasındaki AI oturum artışı (Δ).',{x:0.5,y:1.55,w:12,h:0.4,fontFace:BF,fontSize:13,color:INK2});
 s.addText('Yükselen markalar · Δ oturum',{x:0.5,y:2.1,w:6,h:0.35,fontFace:HF,fontSize:14,bold:true,color:CORALD});
-s.addChart(p.ChartType.bar,[{name:'Δ Oturum',labels:['Özdilek','Adidas','Skechers','SJCAM','Philips','New Balance','Puma','Mavi','Urban Care','Under Armour'],values:[391,300,277,247,247,190,140,123,89,69]}],
+s.addChart(p.ChartType.bar,[{name:'Δ Oturum',labels:['Özdilek','Adidas','Skechers','SJCAM','Philips','New Balance','Puma','Urban Care','Mavi','Crocs'],values:[388,299,274,247,246,189,138,87,85,81]}],
   {x:0.5,y:2.5,w:6.5,h:3.8,barDir:'bar',chartColors:[CORAL],showValue:true,dataLabelColor:INK,dataLabelFontFace:BF,catAxisLabelColor:INK,catAxisLabelFontFace:BF,valAxisHidden:true,showLegend:false,valGridLine:{style:'none'}});
 s.addText('Yükselen sayfalar / ürünler · Δ oturum',{x:7.4,y:2.1,w:5.4,h:0.35,fontFace:HF,fontSize:14,bold:true,color:CORALD});
 const riseLp=[['philips su arıtma cihazı','+211'],['sjcam aksiyon kamera','+193'],['anasayfa','+153'],['özdilek point happy aile seti','+52'],['acton pocket camera gimbal','+44']].map(r=>[{text:r[0],options:{fontSize:12,color:INK2}},{text:r[1],options:{fontSize:12,bold:true,color:GREEN,align:'right'}}]);
