@@ -124,16 +124,44 @@
     );
   }
 
-  // ——— Donut (Chart.js) ———
-  function Donut({groups, metric, colors, height}) {
+  // ——— Donut (Chart.js) — çerçevesiz, yumuşak ———
+  function Donut({groups, metric, colors, height, onSliceClick}) {
     const total = groups.reduce((s,g)=>s+g[metric],0) || 1;
     const build = () => ({ type:'doughnut',
-      data:{ labels:groups.map(g=>g.key), datasets:[{ data:groups.map(g=>g[metric]), backgroundColor:groups.map(g=>colors[g.key]||'#999'), borderWidth:2, borderColor:'var(--bg-card)' }] },
-      options:{ responsive:true, maintainAspectRatio:false, cutout:'58%',
-        plugins:{ legend:{position:'right', labels:{color:chartTheme().ink, font:{size:11}, boxWidth:12}},
+      data:{ labels:groups.map(g=>g.key), datasets:[{ data:groups.map(g=>g[metric]), backgroundColor:groups.map(g=>colors[g.key]||'#999'), borderWidth:0, hoverOffset:6, spacing:1 }] },
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'64%',
+        onClick: onSliceClick ? (e,els)=>{ if(els.length) onSliceClick(groups[els[0].index].key); } : undefined,
+        plugins:{ legend:{position:'right', labels:{color:chartTheme().ink, font:{size:11}, boxWidth:12, usePointStyle:true, pointStyle:'circle'}},
           datalabels:{display:false},
           tooltip:{callbacks:{label:c=>c.label+': '+AU.METRICS[metric].fmt(c.parsed)+' ('+(c.parsed/total*100).toFixed(1)+'%)'}} } } });
     return h(ChartCanvas, { buildConfig:build, deps:[metric, groups], height:height||300 });
+  }
+
+  // ——— Marka donut + çok-metrikli liste ———
+  function BrandDonut({groups, metric, selected, onToggle, height}) {
+    const PAL = ['#F15B2A','#1565C0','#2E7D32','#8E24AA','#F5A623','#00838F','#D32F2F','#6D4C41','#5E35B1','#00897B','#C2185B','#7CB342','#FB8C00','#3949AB'];
+    const top = [...groups].sort((a,b)=>b[metric]-a[metric]).slice(0,12);
+    const colorOf = {}; top.forEach((g,i)=>colorOf[g.key]=PAL[i%PAL.length]);
+    const total = top.reduce((s,g)=>s+g[metric],0)||1;
+    const build = () => ({ type:'doughnut',
+      data:{ labels:top.map(g=>g.key), datasets:[{ data:top.map(g=>g[metric]), backgroundColor:top.map(g=>colorOf[g.key]), borderWidth:0, hoverOffset:6, spacing:1 }] },
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'62%',
+        onClick:(e,els)=>{ if(els.length && onToggle) onToggle(top[els[0].index].key); },
+        plugins:{ legend:{display:false}, datalabels:{display:false},
+          tooltip:{callbacks:{label:c=>c.label+': '+AU.METRICS[metric].fmt(c.parsed)+' ('+(c.parsed/total*100).toFixed(1)+'%)'}} } } });
+    const selSet = selected && selected.length ? new Set(selected) : null;
+    return h('div', { style:{display:'grid', gridTemplateColumns:'minmax(220px,42%) 1fr', gap:'22px', alignItems:'center'} },
+      h(ChartCanvas, { buildConfig:build, deps:[metric, groups, selected], height:height||320 }),
+      h('div', { className:'brand-legend' },
+        h('div', { className:'bl-head' }, h('span',null,''), h('span',null,'Marka'), h('span',null,'Oturum'), h('span',null,'Ciro'), h('span',null,'Tx')),
+        top.map(g => h('div', { key:g.key, className:'bl-row'+(selSet&&selSet.has(g.key)?' on':''), onClick:()=>onToggle&&onToggle(g.key) },
+          h('span',{className:'sw', style:{background:colorOf[g.key]}}),
+          h('span',{className:'bl-name'}, g.key),
+          h('span',{className:'bl-v'}, U.fmtNum(g.sessions)),
+          h('span',{className:'bl-v'}, AU.fmtTRY(g.revenue,{compact:true})),
+          h('span',{className:'bl-v'}, U.fmtNum(g.tx))))
+      )
+    );
   }
 
   // ——— sortable + tıklanabilir tablo ———
@@ -213,13 +241,47 @@
     );
   }
 
-  // ——— Özet mini-özet kartı (tıklayınca ilgili sekmeye gider) ———
-  function SummaryCard({title, goLabel, onGo, rows}) {
+  // ——— Özet mini-özet kartı: çok-metrikli (oturum/ciro/tx) ———
+  function SummaryCard({title, goLabel, onGo, rows, totals}) {
     return h('div', { className:'summary-card', onClick:onGo },
       h('div', { className:'sc-head' }, h('span',{className:'sc-title'},title), h('span',{className:'sc-go'}, (goLabel||'Detay')+' →')),
-      rows.map((r,i)=>h('div',{key:i, className:'sc-row'}, h('span',{className:'nm'}, r.nm), h('span',{className:'vv'}, r.vv)))
+      totals ? h('div', { className:'sc-spark-row' },
+        h('div',{className:'sc-metric', style:{'--m':AU.METRICS.sessions.color}}, h('div',{className:'ml2'},'Oturum'), h('div',{className:'mv2'}, U.fmtNum(totals.sessions))),
+        h('div',{className:'sc-metric', style:{'--m':AU.METRICS.revenue.color}}, h('div',{className:'ml2'},'Ciro'), h('div',{className:'mv2'}, AU.fmtTRY(totals.revenue,{compact:true}))),
+        h('div',{className:'sc-metric', style:{'--m':AU.METRICS.tx.color}}, h('div',{className:'ml2'},'Transaction'), h('div',{className:'mv2'}, U.fmtNum(totals.tx)))
+      ) : null,
+      h('div', { style:{marginTop:totals?'10px':'0'} },
+        h('div',{className:'sc-row', style:{fontSize:'9.5px', fontWeight:700, textTransform:'uppercase', letterSpacing:'.04em', color:'var(--ink-3)', borderBottom:'1px solid var(--line)'}},
+          h('span',{className:'nm'}, ''), h('span',{style:{display:'flex',gap:'14px'}}, h('span',{style:{minWidth:'44px',textAlign:'right'}},'Otr'), h('span',{style:{minWidth:'52px',textAlign:'right'}},'Ciro'), h('span',{style:{minWidth:'26px',textAlign:'right'}},'Tx'))),
+        rows.map((r,i)=>h('div',{key:i, className:'sc-row'},
+          h('span',{className:'nm'}, r.nm),
+          h('span',{style:{display:'flex',gap:'14px',fontFamily:'Bricolage Grotesque',fontWeight:600,fontVariantNumeric:'tabular-nums'}},
+            h('span',{style:{minWidth:'44px',textAlign:'right',color:'var(--ink)'}}, U.fmtNum(r.sessions)),
+            h('span',{style:{minWidth:'52px',textAlign:'right',color:'var(--ink-2)'}}, AU.fmtTRY(r.revenue,{compact:true})),
+            h('span',{style:{minWidth:'26px',textAlign:'right',color:'var(--ink-2)'}}, U.fmtNum(r.tx)))))
+      )
     );
   }
 
-  window.COMP = { Term, Section, PngButton, CsvButton, LlmsBadge, KpiStrip, ChartCanvas, chartTheme, MetricChart, Donut, DataTable, SegToggle, MultiSelect, SearchInput, MonthFilter, SummaryCard };
+  // ——— Tekrar kullanılabilir filtre çubuğu (arama + tip + marka) ———
+  function FilterBar({filters, setFilters, showSearch=true, showPtype=true, showBrand=true, extra}) {
+    const set = (patch)=>setFilters(f=>({...f, ...patch}));
+    const hasF = (filters.search) || (filters.ptypes&&filters.ptypes.length) || (filters.brands&&filters.brands.length);
+    return h('div', null,
+      h('div', { className:'filter-row' },
+        showSearch ? h(SearchInput, { value:filters.search||'', onChange:v=>set({search:v}), placeholder:'Landing page veya marka ara…' }) : null,
+        showPtype ? h(MultiSelect, { label:'tip', options:AU.ALL_PTYPES, selected:filters.ptypes||[], onChange:v=>set({ptypes:v}), width:165 }) : null,
+        showBrand ? h(MultiSelect, { label:'marka', options:AU.ALL_BRANDS, selected:filters.brands||[], onChange:v=>set({brands:v}), width:185 }) : null,
+        extra || null
+      ),
+      hasF ? h('div', { className:'active-filter-chips' },
+        (filters.ptypes||[]).map(p=>h('span',{key:'p'+p,className:'afc',onClick:()=>set({ptypes:filters.ptypes.filter(x=>x!==p)})},'Tip: '+p,h('span',{className:'x'},'×'))),
+        (filters.brands||[]).map(b=>h('span',{key:'b'+b,className:'afc',onClick:()=>set({brands:filters.brands.filter(x=>x!==b)})},'Marka: '+b,h('span',{className:'x'},'×'))),
+        filters.search?h('span',{className:'afc',onClick:()=>set({search:''})},'Arama: '+filters.search,h('span',{className:'x'},'×')):null,
+        h('button',{className:'chip-btn',onClick:()=>setFilters(f=>({...f, ptypes:[], brands:[], search:''}))},'× Temizle')
+      ) : null
+    );
+  }
+
+  window.COMP = { Term, Section, PngButton, CsvButton, LlmsBadge, KpiStrip, ChartCanvas, chartTheme, MetricChart, Donut, BrandDonut, DataTable, SegToggle, MultiSelect, SearchInput, MonthFilter, SummaryCard, FilterBar };
 })();

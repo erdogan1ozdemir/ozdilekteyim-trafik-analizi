@@ -13,13 +13,13 @@
     { id:'gsc', label:'GSC Analizi', soon:true },
   ];
   const SUB_TABS = [
-    { id:'ozet',   label:'Özet',            Comp:T.Ozet,         series:true  },
-    { id:'trend',  label:'Aylık Trend',     Comp:T.Trend,        series:true  },
-    { id:'lp',     label:'Landing Page',    Comp:T.LandingPages, snapshot:true },
-    { id:'ptype',  label:'Sayfa Tipi',      Comp:T.PageTypes,    snapshot:true },
-    { id:'brand',  label:'Marka & Ürün',    Comp:T.BrandProduct, snapshot:true },
-    { id:'noconv', label:'Dönüşmeyen',      Comp:T.NoConvert,    snapshot:true },
-    { id:'llms',   label:'llms.txt Etkisi', Comp:T.LlmsImpact,   series:true  },
+    { id:'ozet',   label:'Özet',                 Comp:T.Ozet,         series:true  },
+    { id:'trend',  label:'Aylık Trend',          Comp:T.Trend,        series:true  },
+    { id:'ptype',  label:'Sayfa Tipi',           Comp:T.PageTypes,    snapshot:true },
+    { id:'lp',     label:'Landing Page',         Comp:T.LandingPages, snapshot:true },
+    { id:'brand',  label:'Marka & Ürün',         Comp:T.BrandProduct, snapshot:true },
+    { id:'noconv', label:'Dönüşüm Fırsatı',      Comp:T.NoConvert,    snapshot:true },
+    { id:'llms',   label:'llms.txt Etkisi',      Comp:T.LlmsImpact,   series:true  },
   ];
 
   function App() {
@@ -54,22 +54,21 @@
       // Header
       h('div', { className:'topbar' },
         h('div', { className:'logo' },
-          h('div', { className:'logo-dot' }),
+          h('img', { src:'assets/brand-logo.svg', alt:B.name||'Özdilekteyim', style:{height:30, marginRight:14, filter:'brightness(0) invert(1)', flexShrink:0}, onError:(e)=>{e.target.style.display='none';} }),
           h('div', { className:'title-block' },
-            h('div', { style:{fontFamily:'Bricolage Grotesque',fontWeight:700,fontSize:'17px',color:'#fff'} }, B.name || 'Özdilekteyim'),
-            h('div', { className:'subtitle' }, B.subtitle || ''))
+            h('div', { className:'subtitle' }, B.subtitle || ''),
+            h('div', { className:'title' }, B.title || ''))
         ),
         h('div', { className:'spacer' }),
-        h('div', { style:{color:'#fff',fontSize:'13px',fontWeight:600,opacity:.92,marginRight:'8px'} }, B.title || ''),
-        h('div', { className:'inbound-brand' },
-          h('div', { className:'inbound-logo-wrap', style:{background:'rgba(255,255,255,.16)'} }, h('span',{style:{color:'#fff',fontWeight:700,fontSize:'13px'}},'Inbound')),
-          h('button', { className:'chip-btn inbound-ctrl', onClick:toggleTheme, style:{background:'rgba(255,255,255,.16)',color:'#fff',border:'1px solid rgba(255,255,255,.3)'} }, theme==='dark'?'☀ Açık':'🌙 Koyu'))
+        h('div', { className:'header-right' },
+          h('button', { className:'theme-toggle', onClick:toggleTheme, title:'Tema değiştir' },
+            h('span',{className:'tt-icon'}, theme==='dark'?'☀':'☾'), theme==='dark'?'Açık':'Koyu'),
+          h('div', { className:'inbound-logo-wrap' }, h('img',{src:'assets/agency-logo.png', alt:'Inbound', style:{height:20, display:'block'}, onError:(e)=>{e.target.replaceWith(Object.assign(document.createElement('span'),{textContent:'Inbound',style:'color:#fff;font-weight:700;font-size:13px'}));}})))
       ),
-      // Ana sekmeler
-      h('div', { className:'main-tabs' },
-        MAIN_TABS.map(t => h('button', { key:t.id, className:'main-tab'+(mainTab===t.id?' active':'')+(t.soon?' disabled':''),
-          onClick:()=> t.soon ? null : setMainTab(t.id) }, t.label, t.soon?h('span',{className:'soon'},'yakında'):null))
-      ),
+      // Ana sekmeler (yalnızca aktif olanlar; "yakında" olanlar gizli)
+      MAIN_TABS.filter(t=>!t.soon).length>1 ? h('div', { className:'main-tabs' },
+        MAIN_TABS.filter(t=>!t.soon).map(t => h('button', { key:t.id, className:'main-tab'+(mainTab===t.id?' active':''), onClick:()=>setMainTab(t.id) }, t.label))
+      ) : null,
       // Alt sekmeler
       h('div', { className:'tabs', role:'tablist' },
         SUB_TABS.map(t => h('button', { key:t.id, className:'tab'+(subTab===t.id?' active':''), 'aria-selected':subTab===t.id,

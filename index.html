@@ -131,6 +131,58 @@
   .chart-toolbar { display:flex; gap:6px; align-items:center; }
   .lbl-toggle { font-size:11px; font-weight:600; padding:5px 11px; border-radius:var(--r-pill); border:1px solid var(--line); background:var(--bg-card); color:var(--ink-2); cursor:pointer; }
   .lbl-toggle.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  /* ===== v3: header, tema butonu, soft filtreler, dark palet ===== */
+  .topbar .title-block .title { font-size:14px; font-weight:600; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.2); }
+  .topbar .title-block .subtitle { font-size:11px; font-family:'Outfit'; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:rgba(255,255,255,.85); }
+  .header-right { display:flex; align-items:center; gap:14px; }
+  .theme-toggle { display:inline-flex; align-items:center; gap:7px; font-family:'Outfit'; font-weight:600; font-size:12.5px; color:#fff;
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.22); border-radius:var(--r-pill); padding:7px 15px; cursor:pointer;
+    backdrop-filter:blur(4px); transition:background .18s, transform .15s; }
+  .theme-toggle:hover { background:rgba(255,255,255,.24); transform:translateY(-1px); }
+  .theme-toggle .tt-icon { font-size:14px; line-height:1; }
+  .topbar .inbound-logo-wrap { background:transparent; padding:0; }
+
+  /* Soft ay filtresi + chip butonları (eski-usul border yerine yumuşak pill) */
+  .ai-toc { background:var(--bg-card); border:1px solid var(--line); }
+  .chip-btn { font-family:'Outfit'; font-weight:600; font-size:12px; padding:7px 13px; border-radius:var(--r-pill);
+    border:1px solid transparent; background:color-mix(in srgb, var(--ink-3) 12%, transparent); color:var(--ink-2); cursor:pointer;
+    transition:background .16s, color .16s, transform .14s; }
+  .chip-btn:hover { background:color-mix(in srgb, var(--accent) 14%, transparent); color:var(--accent-deep); transform:translateY(-1px); }
+  .chip-btn.active { background:var(--accent); color:#fff; box-shadow:0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); }
+
+  /* Sub-tab nav biraz daha soft */
+  .tabs { border-bottom:1px solid var(--line); }
+
+  /* Bölüm özeti mini multi-metrik */
+  .sc-spark-row { display:flex; gap:6px; margin-top:6px; }
+  .sc-metric { flex:1; border-radius:10px; padding:8px 9px; background:color-mix(in srgb, var(--m) 9%, var(--bg-card)); }
+  .sc-metric .ml2 { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-3); }
+  .sc-metric .mv2 { font-family:'Bricolage Grotesque'; font-weight:700; font-size:15px; color:var(--m); margin-top:1px; }
+
+  /* Marka donut + liste */
+  .brand-legend { display:flex; flex-direction:column; gap:2px; max-height:340px; overflow-y:auto; }
+  .brand-legend .bl-row { display:grid; grid-template-columns:14px 1fr auto auto auto; gap:9px; align-items:center; padding:7px 8px; border-radius:9px; cursor:pointer; font-size:12.5px; transition:background .14s; }
+  .brand-legend .bl-row:hover { background:var(--accent-wash); }
+  .brand-legend .bl-row.on { background:color-mix(in srgb, var(--accent) 14%, transparent); }
+  .brand-legend .sw { width:11px; height:11px; border-radius:3px; }
+  .brand-legend .bl-name { font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .brand-legend .bl-v { font-family:'Bricolage Grotesque'; font-weight:600; font-variant-numeric:tabular-nums; color:var(--ink-2); min-width:54px; text-align:right; }
+  .brand-legend .bl-head { display:grid; grid-template-columns:14px 1fr auto auto auto; gap:9px; padding:4px 8px; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-3); }
+  .brand-legend .bl-head span:nth-child(n+3){ min-width:54px; text-align:right; }
+
+  /* DARK — yumuşak nötr gri palet (göz yormayan) */
+  [data-theme="dark"] {
+    --coral:#FF8A63; --coral-tint:#3A2A22; --coral-deep:#FF9670;
+    --teal:#E9EBEE; --ink:#E9EBEE; --ink-2:#A6ABB3; --ink-3:#727781;
+    --line:#2C313A; --line-soft:#242932;
+    --bg:#16181D; --bg-card:#1D2128; --white:#1D2128;
+    --red-wash:#3A2026; --green-wash:#1E3327; --gold:#E0A23C;
+    --accent: #FF8A63; --accent-deep:#FF9670; --accent-wash: color-mix(in srgb, #FF8A63 18%, #1D2128);
+    --shadow-card:0 1px 3px rgba(0,0,0,.4); --shadow-card-hover:0 6px 22px rgba(0,0,0,.5);
+  }
+  [data-theme="dark"] body { background-image:none; }
+  [data-theme="dark"] .kpi2 .k-glow { opacity:.6; }
 </style>
 </head>
 <body>
