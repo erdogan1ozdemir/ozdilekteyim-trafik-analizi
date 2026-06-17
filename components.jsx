@@ -124,17 +124,59 @@
     );
   }
 
-  // ——— Donut (Chart.js) — çerçevesiz, yumuşak ———
+  // ——— Donut (Chart.js) — çerçevesiz; dilim üstünde marka + % (sığarsa, dinamik punto) ———
   function Donut({groups, metric, colors, height, onSliceClick}) {
     const total = groups.reduce((s,g)=>s+g[metric],0) || 1;
     const build = () => ({ type:'doughnut',
       data:{ labels:groups.map(g=>g.key), datasets:[{ data:groups.map(g=>g[metric]), backgroundColor:groups.map(g=>colors[g.key]||'#999'), borderWidth:0, hoverOffset:6, spacing:1 }] },
-      options:{ responsive:true, maintainAspectRatio:false, cutout:'64%',
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'58%',
         onClick: onSliceClick ? (e,els)=>{ if(els.length) onSliceClick(groups[els[0].index].key); } : undefined,
         plugins:{ legend:{position:'right', labels:{color:chartTheme().ink, font:{size:11}, boxWidth:12, usePointStyle:true, pointStyle:'circle'}},
-          datalabels:{display:false},
+          datalabels:{ display:(ctx)=>{ const v=ctx.dataset.data[ctx.dataIndex]; return v/total>=0.06; },
+            color:'#fff', textAlign:'center', font:(ctx)=>{ const p=ctx.dataset.data[ctx.dataIndex]/total; const sz=p>=0.18?13:p>=0.10?11:9; return {family:'Bricolage Grotesque', weight:700, size:sz, lineHeight:1.05}; },
+            formatter:(v,ctx)=>{ const p=(v/total*100); const name=ctx.chart.data.labels[ctx.dataIndex]; return p>=0.10*100? [name, '%'+p.toFixed(0)] : '%'+p.toFixed(0); } },
           tooltip:{callbacks:{label:c=>c.label+': '+AU.METRICS[metric].fmt(c.parsed)+' ('+(c.parsed/total*100).toFixed(1)+'%)'}} } } });
     return h(ChartCanvas, { buildConfig:build, deps:[metric, groups], height:height||300 });
+  }
+
+  // ——— Modal overlay ———
+  function Modal({title, onClose, children, width}) {
+    useEffect(()=>{ const k=e=>{ if(e.key==='Escape') onClose(); }; document.addEventListener('keydown',k); return ()=>document.removeEventListener('keydown',k); },[]);
+    return h('div', { className:'ai-modal-overlay', onClick:onClose },
+      h('div', { className:'ai-modal', style:{maxWidth:(width||820)+'px'}, onClick:e=>e.stopPropagation() },
+        h('div', { className:'ai-modal-head' }, h('strong',null,title), h('button',{className:'ai-modal-x', onClick:onClose, 'aria-label':'Kapat'},'×')),
+        h('div', { className:'ai-modal-body' }, children)
+      )
+    );
+  }
+
+  // ——— Not kartı (yapısal not bloğu) ———
+  function NoteCard({label, children, tone}) {
+    return h('div', { className:'note-card'+(tone?(' '+tone):'') },
+      h('div', { className:'note-label' }, label||'NOT'),
+      h('div', { className:'note-body' }, children)
+    );
+  }
+
+  // ——— Isı haritası tablosu (Sezon Takvimi stili): satır × ay, hmColor; tıklanır ———
+  function HeatTable({rows, months, onRowClick, deltaKey, deltaLabel}) {
+    const lbls = months.map(AU.trMonth);
+    const cols = `200px repeat(${months.length}, minmax(40px,1fr))` + (deltaKey?' 76px':'');
+    const grid = [];
+    grid.push(h('div',{key:'corner', className:'hm-head hm-corner'}));
+    lbls.forEach((m,i)=>grid.push(h('div',{key:'h'+i, className:'hm-head'}, m)));
+    if (deltaKey) grid.push(h('div',{key:'hd', className:'hm-head'}, deltaLabel||'Δ'));
+    rows.forEach((row,ri)=>{
+      const max=Math.max(...row.values), min=Math.min(...row.values), range=max-min||1;
+      grid.push(h('div',{key:'l'+ri, className:'hm-row-label'+(onRowClick?' clickable':''), title:row.label, onClick:onRowClick?()=>onRowClick(row):undefined},
+        h('span',{style:{fontWeight:600}}, row.label)));
+      row.values.forEach((v,i)=>{ const t=(v-min)/range;
+        grid.push(h('div',{key:`c${ri}-${i}`, className:'hm-cell'+(onRowClick?' clickable':''), style:{background:v>0?U.hmColor(t):'var(--line-soft)', color:v>0?U.hmText(t):'var(--ink-3)'}, onClick:onRowClick?()=>onRowClick(row):undefined},
+          h('span',{className:'hm-val'}, v>0?U.fmtNum(v):'·'))); });
+      if (deltaKey) grid.push(h('div',{key:'d'+ri, className:'hm-delta', onClick:onRowClick?()=>onRowClick(row):undefined, style:onRowClick?{cursor:'pointer'}:{}},
+        h('span',{className: row[deltaKey]>0?'delta-pos':row[deltaKey]<0?'delta-neg':'delta-neu'}, (row[deltaKey]>0?'+':'')+U.fmtNum(row[deltaKey]))));
+    });
+    return h('div',{className:'heatmap-scroll'}, h('div',{className:'heatmap', style:{gridTemplateColumns:cols}}, grid));
   }
 
   // ——— Marka donut + çok-metrikli liste ———
@@ -283,5 +325,5 @@
     );
   }
 
-  window.COMP = { Term, Section, PngButton, CsvButton, LlmsBadge, KpiStrip, ChartCanvas, chartTheme, MetricChart, Donut, BrandDonut, DataTable, SegToggle, MultiSelect, SearchInput, MonthFilter, SummaryCard, FilterBar };
+  window.COMP = { Term, Section, PngButton, CsvButton, LlmsBadge, KpiStrip, ChartCanvas, chartTheme, MetricChart, Donut, BrandDonut, DataTable, SegToggle, MultiSelect, SearchInput, MonthFilter, SummaryCard, FilterBar, Modal, NoteCard, HeatTable };
 })();

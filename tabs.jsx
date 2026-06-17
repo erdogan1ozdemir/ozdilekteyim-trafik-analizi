@@ -4,7 +4,7 @@
   const { useState, useRef, useMemo } = React;
   const U = window.U, AU = window.AU, C = window.COMP;
   const { Section, PngButton, CsvButton, LlmsBadge, KpiStrip, MetricChart, Donut, BrandDonut, DataTable, SegToggle,
-          ChartCanvas, chartTheme, Term, MultiSelect, SearchInput, SummaryCard, FilterBar } = C;
+          ChartCanvas, chartTheme, Term, MultiSelect, SearchInput, SummaryCard, FilterBar, Modal, NoteCard, HeatTable } = C;
 
   function ExportSection(props) {
     const ref = useRef(null);
@@ -25,6 +25,41 @@
   const brandCol = {key:'brand', label:'Marka', get:r=>r.brand||'', render:r=>r.brand?h('span',{className:'pill',style:{fontSize:'11px'}},r.brand):h('span',{style:{color:'var(--ink-3)'}},'–')};
   const fmtBy = (m,v)=>AU.METRICS[m].fmt(v);
   const metricSeg = (metric,setMetric)=>h(SegToggle,{options:[{key:'sessions',label:'Oturum'},{key:'revenue',label:'Ciro'},{key:'tx',label:'Transaction'}],value:metric,onChange:setMetric});
+
+  // marka × ay ısı haritası satırları
+  function brandHeatRows(allRows, metric, opts){
+    opts=opts||{}; const months=AU.MONTHS;
+    const totals=AU.groupBy(allRows.filter(r=>r.brand), r=>r.brand);
+    const rise=AU.momentum(allRows, r=>r.brand); const dMap=new Map(rise.map(x=>[x.key,x.diff]));
+    const series=new Map(totals.map(b=>[b.key, new Array(months.length).fill(0)]));
+    for(const r of allRows){ if(r.brand && series.has(r.brand)){ const i=months.indexOf(r.ym); if(i>=0) series.get(r.brand)[i]+=r[metric]; } }
+    let arr=totals.map(b=>({label:b.key, key:b.key, values:series.get(b.key), diff:dMap.get(b.key)||0, total:b[metric]}));
+    arr.sort((a,b)=> opts.sortBy==='diff' ? b.diff-a.diff : b.total-a.total);
+    if(opts.onlyRising) arr=arr.filter(x=>x.diff>0);
+    return opts.limit ? arr.slice(0,opts.limit) : arr;
+  }
+
+  // marka detay modalı: aylık çoklu-metrik akış + marka LP tablosu
+  function BrandModalView({brand, allRows, onClose}){
+    const rows=allRows.filter(r=>r.brand===brand);
+    const t=AU.totals(rows);
+    const lps=groupLP(rows).sort((a,b)=>b.sessions-a.sessions).slice(0,12);
+    const cols=[ {key:'lp',label:'Sayfa',get:r=>r.lp,sortable:false,render:lpCell},
+      {key:'sessions',label:'Oturum',align:'right',render:r=>U.fmtFull(r.sessions)},
+      {key:'revenue',label:'Ciro',align:'right',render:r=>AU.fmtTRY(r.revenue)},
+      {key:'tx',label:'Tx',align:'right',render:r=>U.fmtFull(r.tx)} ];
+    return h(Modal, { title:brand+' · marka detayı', onClose, width:880 },
+      h(KpiStrip, { cols:4, items:[
+        {label:'Oturum', value:U.fmtFull(t.sessions), color:AU.METRICS.sessions.color},
+        {label:'Ciro', value:AU.fmtTRY(t.revenue), color:AU.METRICS.revenue.color},
+        {label:'Transaction', value:U.fmtFull(t.tx), color:AU.METRICS.tx.color},
+        {label:'AI trafikli sayfa', value:U.fmtFull(new Set(rows.map(r=>r.lp)).size), color:'#8E24AA'} ]}),
+      h('div',{style:{fontSize:'12.5px',fontWeight:700,color:'var(--ink-2)',margin:'6px 0 4px'}},'Aylık akış'),
+      h(MetricChart, { rows, defaultMetrics:['sessions','revenue'], height:260 }),
+      h('div',{style:{fontSize:'12.5px',fontWeight:700,color:'var(--ink-2)',margin:'14px 0 6px'}},'Bu markanın en çok trafik alan sayfaları'),
+      h(DataTable, { columns:cols, rows:lps, initialSort:{key:'sessions',dir:'desc'} })
+    );
+  }
 
   // ============ 1. ÖZET ============
   function Ozet({rows, allRows, navTo}) {
@@ -49,15 +84,10 @@
     const llmsT = AU.totals(rows.filter(r=>r.inLlms));
     const mk = (g)=>({nm:g.key||AU.lpLabel(g.lp), sessions:g.sessions, revenue:g.revenue, tx:g.tx});
 
-    // aylık yükselen markalar tablosu
+    // aylık yükselen markalar (ısı haritası)
     const months = AU.MONTHS;
-    const monthlyRisers = useMemo(()=>{
-      const rise = AU.momentum(allRows, r=>r.brand).filter(x=>x.diff>0).slice(0,8);
-      const set = new Map(rise.map(x=>[x.key,{brand:x.key, diff:x.diff, series:new Array(months.length).fill(0)}]));
-      for (const r of allRows){ if(r.brand && set.has(r.brand)){ const i=months.indexOf(r.ym); if(i>=0) set.get(r.brand).series[i]+=r.sessions; } }
-      return [...set.values()];
-    }, []);
-    const maxCell = Math.max(1, ...monthlyRisers.flatMap(b=>b.series));
+    const [modalBrand, setModalBrand] = useState(null);
+    const monthlyRisers = useMemo(()=>brandHeatRows(allRows,'sessions',{sortBy:'diff', onlyRising:true, limit:10}), []);
 
     return h('div', null,
       h(KpiStrip, { items:kpis, cols:5 }),
@@ -82,20 +112,14 @@
         h(SummaryCard, { title:'Dönüşüm Fırsatı', goLabel:'Dönüşüm Fırsatı', onGo:()=>navTo('noconv'), totals:fTot, rows:firsat.slice(0,4).map(mk) }),
         h(SummaryCard, { title:'llms.txt sayfaları', goLabel:'llms.txt Etkisi', onGo:()=>navTo('llms'), totals:{sessions:llmsT.sessions,revenue:llmsT.revenue,tx:llmsT.tx}, rows:llmsTop.map(mk) })
       ),
-      // aylık yükselen markalar tablosu
-      h(ExportSection, { id:'sec-rise', title:'Zaman İçinde Yükselen Markalar — Aylık Oturum',
-        desc:'Dönem genelinde oturum artışı en yüksek markalar; her ay için oturum dağılımı ısı tonuyla gösterilir. Δ, dönemin ilk yarısı ile ikinci yarısı farkıdır.',
+      // aylık yükselen markalar — ısı haritası (tıklanır)
+      h(ExportSection, { id:'sec-rise', title:'Zaman İçinde Yükselen Markalar — Marka Sezon Takvimi',
+        desc:'Dönem genelinde oturum artışı en yüksek 10 marka; her ay için oturum yoğunluğu ısı tonuyla gösterilir (kırmızı düşük → yeşil yüksek). Δ, dönemin ilk yarısı ile ikinci yarısı farkıdır. Bir markaya tıklayarak detayını açabilirsiniz.',
         pngName:'ozdilekteyim-ai-yukselen-aylik',
-        csv:{ rows:monthlyRisers, name:'yukselen-markalar-aylik', headers:[{label:'Marka',get:r=>r.brand}].concat(months.map((m,i)=>({label:AU.trMonth(m),get:r=>Math.round(r.series[i])}))).concat([{label:'Δ',get:r=>Math.round(r.diff)}]) } },
-        h('div',{className:'tbl-wrap'}, h('table',{className:'tbl'},
-          h('thead',null,h('tr',null, h('th',null,'Marka'), months.map(m=>h('th',{key:m,style:{textAlign:'right'}},AU.trMonth(m))), h('th',{style:{textAlign:'right'}},'Δ'))),
-          h('tbody',null, monthlyRisers.map(b=>h('tr',{key:b.brand},
-            h('td',{style:{fontWeight:600}}, b.brand),
-            b.series.map((v,i)=>{ const a=v/maxCell; return h('td',{key:i,className:'num',style:{background:a>0.04?`color-mix(in srgb, var(--accent) ${Math.round(a*55)}%, transparent)`:'transparent'}}, v?U.fmtNum(v):'·'); }),
-            h('td',{className:'num'}, h('span',{className:'delta-pos'}, '+'+U.fmtNum(b.diff)))
-          )))
-        ))
-      )
+        csv:{ rows:monthlyRisers, name:'yukselen-markalar-aylik', headers:[{label:'Marka',get:r=>r.label}].concat(months.map((m,i)=>({label:AU.trMonth(m),get:r=>Math.round(r.values[i])}))).concat([{label:'Δ',get:r=>Math.round(r.diff)}]) } },
+        h(C.HeatTable, { rows:monthlyRisers, months, deltaKey:'diff', deltaLabel:'Δ', onRowClick:r=>setModalBrand(r.key) })
+      ),
+      modalBrand ? h(BrandModalView, { brand:modalBrand, allRows, onClose:()=>setModalBrand(null) }) : null
     );
   }
 
@@ -174,8 +198,10 @@
   // ============ 4. LANDING PAGE ============
   function LandingPages({rows, filters, setFilters, selectedLp, setSelectedLp}) {
     const [metric, setMetric] = useState('sessions');
+    const [showAll, setShowAll] = useState(false);
     const filtered = useMemo(()=>AU.applyFilters(rows, filters), [rows, filters]);
     const data = useMemo(()=>groupLP(filtered), [filtered]);
+    const CAP = 100;
     const chartRows = selectedLp ? AU.ROWS.filter(r=>r.lp===selectedLp) : filtered;
     const cols = [
       {key:'lp', label:'Landing Page', get:r=>r.lp, sortable:false, render:lpCell}, brandCol,
@@ -197,10 +223,12 @@
       // FILTRELER — chart altında, tablonun hemen üstünde
       h(FilterBar, { filters, setFilters, extra: metricSeg(metric,setMetric) }),
       h(ExportSection, { id:'sec-lp', title:'Landing Page Tablosu — '+AU.METRICS[metric].short,
-        desc:'Bir satıra tıklayınca üstteki grafik o sayfanın akışına döner. ✦ llms işareti llms.txt sayfalarını gösterir. '+data.length+' sayfa.',
+        desc:'Excel\'deki tüm sayfalar tekilleştirilmiş haldedir (toplamda oturum almış '+data.length+' sayfa). Bir satıra tıklayınca üstteki grafik o sayfanın akışına döner. ✦ llms işareti llms.txt sayfalarını gösterir.',
         pngName:'ozdilekteyim-ai-landing-page', csv:{rows:[...data].sort((a,b)=>b[metric]-a[metric]),headers:csvHeaders,name:'landing-pages'} },
-        h(DataTable, { columns:cols, rows:data, initialSort:{key:metric,dir:'desc'}, maxRows:50,
-          onRowClick:r=>setSelectedLp(selectedLp===r.lp?null:r.lp), activeKey:selectedLp, keyOf:r=>r.lp })
+        h(DataTable, { columns:cols, rows:data, initialSort:{key:metric,dir:'desc'}, maxRows: showAll?undefined:CAP,
+          onRowClick:r=>setSelectedLp(selectedLp===r.lp?null:r.lp), activeKey:selectedLp, keyOf:r=>r.lp }),
+        data.length>CAP ? h('div',{style:{textAlign:'center',marginTop:'12px'}},
+          h('button',{className:'chip-btn',onClick:()=>setShowAll(s=>!s)}, showAll?('İlk '+CAP+' sayfayı göster'):('Tümünü göster ('+U.fmtFull(data.length)+' sayfa)'))) : null
       )
     );
   }
@@ -209,6 +237,8 @@
   function BrandProduct({rows}) {
     const [metric, setMetric] = useState('sessions');
     const [filters, setFilters] = useState({ search:'', ptypes:[], brands:[] });
+    const [modalBrand, setModalBrand] = useState(null);
+    const heatRows = useMemo(()=>brandHeatRows(AU.ROWS, metric, {sortBy:'sessions'}), [metric]);
     const brandRows = useMemo(()=>AU.groupBy(rows.filter(r=>r.brand),r=>r.brand), [rows]);
     const selSet = filters.brands.length?new Set(filters.brands):null;
     // LP tablosu: filtreye göre (marka + tip + arama)
@@ -229,15 +259,21 @@
       h(FilterBar, { filters, setFilters }),
       h(ExportSection,{id:'sec-brand-lp',title:'Marka Sayfaları'+(filters.brands.length?(' · '+filters.brands.join(', ')):' (tümü)'),desc:'Seçili markalara ait landing page\'ler, tüm metriklerle. '+lpRows.length+' sayfa.',pngName:'ozdilekteyim-ai-marka-lp',
         csv:{rows:[...lpRows].sort((a,b)=>b[metric]-a[metric]),name:'marka-landing-pages',headers:[{label:'Landing Page',get:r=>r.lp},{label:'Marka',get:r=>r.brand},{label:'Tip',get:r=>r.ptype},{label:'Oturum',get:r=>Math.round(r.sessions)},{label:'Ciro',get:r=>Math.round(r.revenue)},{label:'Transaction',get:r=>Math.round(r.tx)}]}},
-        lpRows.length? h(DataTable,{columns:lpCols,rows:lpRows,initialSort:{key:metric,dir:'desc'},maxRows:50}) : h('div',{style:{color:'var(--ink-3)'}},'Seçili filtrede sayfa yok.'))
+        lpRows.length? h(DataTable,{columns:lpCols,rows:lpRows,initialSort:{key:metric,dir:'desc'},maxRows:50}) : h('div',{style:{color:'var(--ink-3)'}},'Seçili filtrede sayfa yok.')),
+      h(ExportSection,{id:'sec-brand-heat',title:'Marka Sezon Takvimi — '+AU.METRICS[metric].short,
+        desc:'Tüm markaların aydan aya '+AU.METRICS[metric].short.toLowerCase()+' yoğunluğu (kırmızı düşük → yeşil yüksek, satır içi ölçek). Δ dönemin ilk/ikinci yarı farkıdır. Bir markaya tıklayarak detayını (aylık akış + sayfalar) açabilirsiniz. Metrik üstteki butonlardan değişir.',
+        pngName:'ozdilekteyim-ai-marka-sezon',
+        csv:{rows:heatRows,name:'marka-sezon-takvimi',headers:[{label:'Marka',get:r=>r.label}].concat(AU.MONTHS.map((m,i)=>({label:AU.trMonth(m),get:r=>Math.round(r.values[i])}))).concat([{label:'Δ oturum',get:r=>Math.round(r.diff)}])}},
+        h(C.HeatTable,{rows:heatRows, months:AU.MONTHS, deltaKey:'diff', deltaLabel:'Δ otr', onRowClick:r=>setModalBrand(r.key)})),
+      modalBrand ? h(BrandModalView,{brand:modalBrand, allRows:AU.ROWS, onClose:()=>setModalBrand(null)}) : null
     );
   }
 
   // ============ 6. DÖNÜŞÜM FIRSATI ============
   function NoConvert({rows}) {
     const [filters, setFilters] = useState({ search:'', ptypes:[], brands:[] });
-    const base = useMemo(()=>groupLP(AU.applyFilters(rows, filters)).filter(x=>x.ptype!=='Sepet/Checkout' && x.ptype!=='Hesap' && x.sessions>=5 && x.tx===0).sort((a,b)=>b.sessions-a.sessions), [rows, filters]);
-    const data = base.slice(0,40);
+    const base = useMemo(()=>groupLP(AU.applyFilters(rows, filters)).filter(x=>x.ptype!=='Sepet/Checkout' && x.ptype!=='Hesap' && x.sessions>=10 && x.tx===0).sort((a,b)=>b.sessions-a.sessions), [rows, filters]);
+    const data = base;
     const topBar = base.slice(0,12);
     const buildBar=()=>{ const th=chartTheme();
       return { type:'bar', data:{labels:topBar.map(x=>AU.lpLabel(x.lp).slice(0,32)),datasets:[{label:'Oturum',data:topBar.map(x=>x.sessions),backgroundColor:topBar.map(x=>PTYPE_COLORS[x.ptype]||'#F15B2A'),borderRadius:5,datalabels:{display:false}}]},
@@ -255,7 +291,7 @@
       h(ExportSection,{id:'sec-noconv-bar',title:'En Yüksek Oturumlu Dönüşüm Fırsatı Sayfaları',desc:'Oturum ≥ 5 ve transaction = 0. Renk sayfa tipini gösterir.',pngName:'ozdilekteyim-ai-firsat-bar'},
         topBar.length? h(ChartCanvas,{buildConfig:buildBar,deps:[rows,filters],height:Math.max(220,topBar.length*28+50)}) : h('div',{style:{color:'var(--ink-3)'}},'Kriterlere uyan sayfa yok.')),
       h(FilterBar, { filters, setFilters }),
-      h(ExportSection,{id:'sec-noconv',title:'Dönüşüm Fırsatı Sayfaları Tablosu',desc:'Oturuma göre sıralı ilk 40 sayfa. '+base.length+' sayfa kriterlere uyuyor.',pngName:'ozdilekteyim-ai-firsat',
+      h(ExportSection,{id:'sec-noconv',title:'Dönüşüm Fırsatı Sayfaları Tablosu',desc:'Oturum ≥ 10 ve transaction = 0 olan tüm sayfalar, oturuma göre sıralı. '+base.length+' sayfa kriterlere uyuyor.',pngName:'ozdilekteyim-ai-firsat',
         csv:{rows:data,name:'donusum-firsati-sayfalari',headers:[{label:'Landing Page',get:r=>r.lp},{label:'Marka',get:r=>r.brand||''},{label:'Tip',get:r=>r.ptype},{label:'Oturum',get:r=>Math.round(r.sessions)},{label:'Transaction',get:r=>r.tx},{label:'llms.txt',get:r=>r.inLlms?'Evet':'Hayır'}]}},
         data.length? h(DataTable,{columns:cols,rows:data,initialSort:{key:'sessions',dir:'desc'}}) : h('div',{style:{color:'var(--ink-3)'}},'Kriterlere uyan sayfa yok.'))
     );
@@ -304,7 +340,7 @@
       {key:'revenue',label:'Doğrudan Ciro',align:'right',render:r=>AU.fmtTRY(r.revenue)},
     ];
     return h('div', null,
-      h('div',{className:'scope-note'},
+      h(C.NoteCard, { label:'NOT' },
         h(Term,{t:'llms.txt'},'llms.txt'),' dosyası ',h('strong',null,'Şubat 2026'),'\'da eklenmiştir; "Önemli Sayfalar" altında ',h('strong',null,AU.META.llmsPathCount+' sayfa'),' tanımlıdır, bunlardan ',h('strong',null,AU.META.llmsInData+' tanesi'),' AI trafiği verisinde gözlemlenmektedir. ',
         'Bu sayfalar ağırlıkla kategori/marka niteliğindedir; aşağıda hem doğrudan oturum hem de bu kategori/markalardaki ',h('strong',null,'ürünlere gelen ilişkili trafik'),' birlikte sunulmaktadır.'),
       h(KpiStrip,{cols:4, items:[
@@ -315,8 +351,8 @@
       ]}),
       h(ExportSection,{id:'sec-llms-chart',title:'llms.txt Sayfaları vs Diğer — Aylık Oturum',desc:'Çift eksen: sol llms.txt sayfaları, sağ diğer sayfalar. Kesikli çizgi Şubat 2026 (llms.txt eklendi).',pngName:'ozdilekteyim-ai-llms-etki'},
         h(ChartCanvas,{buildConfig:buildLine,deps:[],height:340})),
-      h('div',{className:'scope-note'}, h('strong',null,'İlişki nasıl kuruldu? '),
-        'llms.txt\'deki her sayfa bir markaya ya da kategoriye karşılık gelir (ör. Adidas spor ayakkabı sayfası). İlgili ürünler, ',h('strong',null,'aynı markaya ya da aynı kategoriye bağlı'),' ürün sayfalarıdır; bu sayfalar ziyaret edilerek bağlı oldukları kategori/marka teyit edilmiştir. Toplam değer her ürünü bir kez sayar (mükerrer sayım yoktur).'),
+      h(C.NoteCard, { label:'YÖNTEM', tone:'method' }, h('strong',null,'İlişki nasıl kuruldu? '),
+        'llms.txt\'deki her sayfa bir markaya ya da kategoriye karşılık gelir (ör. Adidas spor ayakkabı sayfası). İlgili ürünler, ',h('strong',null,'aynı markaya ya da aynı kategoriye bağlı'),' ürün sayfalarıdır; bu sayfaların bağlı olduğu kategori/marka teyit edilmiştir. Toplam değer her ürünü ',h('strong',null,'yalnızca bir kez sayar'),' (mükerrer sayım yoktur).'),
       h('div',{className:'insight-strip',style:{margin:'4px 0 8px'}},h('span',{className:'arrow'},'➜'),
         h('span',null,'llms.txt sayfalarının doğrudan oturumu sınırlı seyretse de, bu marka ve kategorilerin ürün sayfalarına gelen ',h('strong',null,'ilişkili trafik '+U.fmtFull(totalRel)+' oturum'),' düzeyindedir; kullanıcıların kategori sayfası yerine doğrudan ilgili ürün sayfalarına ulaşmış olabileceği değerlendirilebilir.')),
       // FILTRELER — chart altında, tablonun hemen üstünde
