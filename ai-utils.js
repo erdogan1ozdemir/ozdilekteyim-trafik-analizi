@@ -58,8 +58,9 @@ window.AU = (function(){
 
   // LP başlığını okunur kısa etikete çevir
   function lpLabel(lp){
-    if (!lp) return '(boş)';
+    if (!lp || lp === '/') return '/ (anasayfa)';
     let s = lp.replace(/^\/+/, '');
+    if (!s) return '/ (anasayfa)';
     if (s.length > 52) s = s.slice(0, 49) + '…';
     return s;
   }

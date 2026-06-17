@@ -78,8 +78,9 @@
       },
         h(MetricToggleChart, { rows:allRows, defaultMetrics:['sessions','revenue'] }),
         h('div', { className:'scope-note' },
-          'Kapsam: veri kaynağı ', h('strong',null,'%100 chatgpt.com referral'),'. Tutarlar ', h('strong',null,'₺'),
-          ' cinsindendir. ', (AU.META.isSample? 'Eldeki dosya örneklem niteliğindedir; tam veri geldiğinde kapsam genişleyecektir. ':''),
+          'Kapsam: yapay zeka kaynaklı referral trafiği, ', h('strong',null,'ağırlıkla chatgpt.com'),
+          ' (az miktarda Perplexity ve Copilot dahil). Tutarlar ', h('strong',null,'₺'), ' cinsindendir. ',
+          (AU.META.isSample? 'Eldeki dosya örneklem niteliğindedir. ':''),
           (AU.META.partialMonths||[]).length? ('İşaretli ay(lar) (*) kısmi dönem içerir: '+AU.META.partialMonths.map(AU.trMonth).join(', ')+'.'):''
         )
       )
@@ -239,7 +240,7 @@
           scales:{x:{grid:{color:th.grid},ticks:{color:th.tick,callback:v=>metric==='revenue'||metric==='aov'?AU.fmtTRY(v,{compact:true}):U.fmtNum(v)}},y:{grid:{display:false},ticks:{color:th.ink,font:{size:11}}}}} };
     };
     return h('div', null,
-      h('div',{className:'scope-note'},'Marka çıkarımı ', h('code',null,'/magaza/marka/'),' path\'i ve ürün slug\'larındaki marka sözlüğü ile yapılır. Eldeki örneklemde ', h('strong',null,'/magaza/marka/'),' kapsamı sınırlıdır; marka kırılımı ağırlıkla ürün slug\'larından türetilmiştir, tam veride zenginleşecektir.'),
+      h('div',{className:'scope-note'},'Marka çıkarımı ', h('code',null,'/magaza/marka/'),' path\'i ve ürün slug\'larındaki marka sözlüğü ile yapılır. Veride ', h('strong',null,'/magaza/marka/'),' kapsamı sınırlı olduğundan marka kırılımı ağırlıkla ürün slug\'larından türetilmiştir; sözlüğe marka eklenerek kapsam genişletilebilir.'),
       h('div',{style:{display:'flex',justifyContent:'flex-end',marginBottom:'12px'}},
         h(SegToggle,{options:[{key:'sessions',label:'Oturum'},{key:'revenue',label:'Ciro'},{key:'tx',label:'Transaction'}],value:metric,onChange:setMetric})),
       h(ExportSection,{id:'sec-brand-bar',title:'Top Markalar — '+AU.METRICS[metric].short,desc:'Seçili aylara göre dinamik.',pngName:'ozdilekteyim-ai-marka'},
@@ -313,7 +314,7 @@
     return h('div', null,
       h('div',{className:'scope-note'},
         h(Term,{t:'llms.txt'},'llms.txt'),' dosyası ', h('strong',null,'Şubat 2026'),'\'da eklenmiştir; "Önemli Sayfalar" altında ', h('strong',null,AU.META.llmsPathCount+' sayfa'),' tanımlıdır. ',
-        'Eldeki örneklemde bu sayfalardan ', h('strong',null,AU.META.llmsInData+' tanesi'),' AI trafiği verisinde görünmektedir. Bu nedenle sayfa-bazlı etki ölçümü tam veri geldiğinde anlam kazanacaktır; aşağıda hem sayfa-bazlı hem de Şubat öncesi/sonrası toplam karşılaştırma sunulmaktadır.'),
+        'Bu sayfalardan ', h('strong',null,AU.META.llmsInData+' tanesi'),' AI trafiği verisinde gözlemlenmektedir. Aşağıda llms.txt sayfaları ile diğer sayfaların aylık seyri ve Şubat 2026 öncesi/sonrası karşılaştırması sunulmaktadır; kesikli çizgi llms.txt\'nin eklendiği ayı işaret eder.'),
       h(KpiStrip,{items:[
         {label:'llms.txt — Şubat öncesi', value:U.fmtFull(preL), color:'#F15B2A', sub:'toplam oturum'},
         {label:'llms.txt — Şubat ve sonrası', value:U.fmtFull(postL), color:'#F15B2A', sub:'toplam oturum'},
