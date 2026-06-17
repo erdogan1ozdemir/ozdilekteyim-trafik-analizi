@@ -1,0 +1,60 @@
+/* Shared slide styles - 1280×720 stage, scaled via deck_stage. */
+@import url('colors_and_type.css');
+
+html, body { margin: 0; padding: 0; background: var(--teal); }
+
+.slide {
+  width: 1280px; height: 720px;
+  position: relative;
+  background: #fff;
+  color: var(--teal);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.slide .breadcrumb-top {
+  position: absolute; top: 28px; left: 48px;
+  font-size: 12px; letter-spacing: 0.02em;
+}
+.slide .breadcrumb-top .section { font-family: var(--font-display); font-weight: 700; color: var(--coral); }
+.slide .breadcrumb-top .sep { color: var(--coral); margin: 0 6px; opacity: .6; }
+.slide .breadcrumb-top .title { font-family: var(--font-body); color: var(--coral); opacity: .9; }
+
+.slide .logo-bl {
+  position: absolute; left: 44px; bottom: 32px;
+  width: 36px; height: 36px;
+  background: url(assets/inbound-o-teal.png) no-repeat center/contain;
+}
+.slide.dark .logo-bl { background-image: url(assets/inbound-o-white.png); }
+.slide.coral .logo-bl { background-image: url(assets/inbound-o-white.png); }
+
+.slide .source-pill {
+  position: absolute; left: 100px; bottom: 36px;
+  background: var(--coral); color: #fff;
+  font-family: var(--font-display); font-weight: 700; font-size: 11px;
+  padding: 6px 12px; border-radius: 8px;
+}
+
+.slide h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin: 0; }
+.slide h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
+.slide p  { font-family: var(--font-body); line-height: 1.55; margin: 0; }
+
+.hl { background: linear-gradient(to top, var(--coral) 28%, transparent 28%); box-decoration-break: clone; -webkit-box-decoration-break: clone; padding: 0 0.06em; }
+
+.slide.coral { background: var(--coral); color: #fff; }
+.slide.dark  { background: var(--teal); color: #fff; }
+
+.gridlines::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right, transparent calc(20% - 0.5px), #F0EDE8 calc(20% - 0.5px), #F0EDE8 20%, transparent 20%),
+    linear-gradient(to right, transparent calc(40% - 0.5px), #F0EDE8 calc(40% - 0.5px), #F0EDE8 40%, transparent 40%),
+    linear-gradient(to right, transparent calc(60% - 0.5px), #F0EDE8 calc(60% - 0.5px), #F0EDE8 60%, transparent 60%),
+    linear-gradient(to right, transparent calc(80% - 0.5px), #F0EDE8 calc(80% - 0.5px), #F0EDE8 80%, transparent 80%);
+  opacity: .6;
+}
+.slide > * { position: relative; z-index: 1; }
+
+/* coral accent line */
+.accent-line { width: 60px; height: 3.5px; background: var(--coral); border-radius: 999px; display: block; }
+.slide.coral .accent-line, .slide.dark .accent-line { background: #fff; }

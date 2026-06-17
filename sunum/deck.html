@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Özdilekteyim · AI Trafik Analizi · Inbound</title>
+<link rel="stylesheet" href="slides.css">
+<style>
+  html, body { margin:0; padding:0; background:#10332F; }
+  deck-stage > section { width: 1280px; height: 720px; }
+  deck-stage > section > .slide { width:100%; height:100%; box-sizing:border-box; }
+  /* sunum-özel yardımcılar */
+  .kpi-card { border-radius:16px; padding:24px 20px; text-align:center; }
+  .kpi-card .v { font-family:var(--font-display); font-weight:700; font-size:52px; line-height:1; letter-spacing:-.02em; }
+  .kpi-card .v small { font-size:26px; }
+  .kpi-card .l { font-family:var(--font-body); font-size:11.5px; opacity:.9; letter-spacing:.04em; margin-top:10px; text-transform:uppercase; }
+  .bars { display:flex; align-items:flex-end; gap:18px; height:300px; padding-top:30px; }
+  .bars .col { flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; }
+  .bars .bar { width:64%; background:var(--coral); border-radius:7px 7px 0 0; position:relative; }
+  .bars .bar.partial { background:repeating-linear-gradient(45deg,var(--coral) 0 6px,#ffd9c9 6px 12px); }
+  .bars .val { font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--teal); margin-bottom:7px; }
+  .bars .rev { font-family:var(--font-body); font-size:10.5px; color:var(--coral-deep); margin-bottom:3px; font-weight:600; }
+  .bars .mon { font-family:var(--font-body); font-size:12px; color:var(--ink-2); margin-top:10px; }
+  .ptbl { width:100%; border-collapse:collapse; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(16,51,47,.06); font-family:var(--font-body); font-size:13px; }
+  .ptbl thead tr { background:var(--teal); color:#fff; }
+  .ptbl th { padding:11px 14px; text-align:left; font-family:var(--font-display); font-weight:700; font-size:11.5px; letter-spacing:.04em; }
+  .ptbl th.n, .ptbl td.n { text-align:right; font-variant-numeric:tabular-nums; }
+  .ptbl td { padding:9px 14px; border-top:1px solid #E0E0E0; }
+  .ptbl td.n { font-family:var(--font-display); font-weight:500; }
+  .minilist { list-style:none; padding:0; margin:0; }
+  .minilist li { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid var(--line-soft); font-size:12.5px; }
+  .minilist li .nm { color:var(--teal); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .minilist li .vv { font-family:var(--font-display); font-weight:700; color:var(--coral-deep); white-space:nowrap; }
+  .col-card { background:#fff; border-radius:16px; padding:20px 18px; box-shadow:0 2px 8px rgba(16,51,47,.08); }
+  .col-card h4 { margin:0 0 10px; font-family:var(--font-display); font-weight:700; font-size:15px; color:var(--teal); }
+  .col-card h4 .tag { font-size:10px; font-weight:600; color:var(--coral); display:block; letter-spacing:.06em; text-transform:uppercase; margin-bottom:2px; }
+  .bbar-row { display:flex; align-items:center; gap:12px; margin-bottom:11px; }
+  .bbar-row .nm { width:120px; font-size:13px; color:var(--teal); font-weight:600; }
+  .bbar-row .track { flex:1; height:18px; background:var(--line-soft); border-radius:999px; overflow:hidden; }
+  .bbar-row .fill { height:100%; background:var(--coral); border-radius:999px; }
+  .bbar-row .vv { width:78px; text-align:right; font-family:var(--font-display); font-weight:700; font-size:13px; color:var(--teal); font-variant-numeric:tabular-nums; }
+  .llms-badge { display:inline-block; font-size:10px; font-weight:700; color:var(--coral-deep); border:1px solid var(--coral); border-radius:999px; padding:1px 6px; margin-left:6px; }
+  b.pos { color:var(--green); font-family:var(--font-display); }
+  b.neg { color:var(--red); font-family:var(--font-display); }
+  b.acc { color:var(--coral-deep); font-family:var(--font-display); }
+</style>
+<script src="deck-stage.js"></script>
+</head>
+<body>
+<deck-stage width="1280" height="720">
+
+  <!-- 01 Cover -->
+  <section data-screen-label="01 Kapak">
+    <div class="slide coral" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <img src="assets/inbound-big-o-white.png" style="position:absolute;right:-120px;top:-200px;height:1400px;opacity:.14;">
+      <div style="text-align:center;position:relative;">
+        <div style="font-family:var(--font-display);font-weight:300;font-size:15px;letter-spacing:.12em;color:#fff;opacity:.9;text-transform:uppercase;">Özdilekteyim × Inbound</div>
+        <h1 style="font-size:78px;color:#fff;margin-top:18px;">AI Trafik<br>Analizi</h1>
+        <p style="margin-top:20px;font-size:20px;color:#fff;opacity:.92;font-weight:400;">Yapay zeka kaynaklı referral trafiği · Kasım 2025 – Haziran 2026</p>
+      </div>
+      <img src="assets/inbound-wordmark-white.png" style="position:absolute;bottom:56px;left:50%;transform:translateX(-50%);height:32px;">
+    </div>
+  </section>
+
+  <!-- 02 Agenda -->
+  <section data-screen-label="02 Akış">
+    <div class="slide" style="display:grid;grid-template-columns:45% 55%;">
+      <div style="background:var(--coral);color:#fff;padding:60px 50px;display:flex;flex-direction:column;justify-content:center;position:relative;">
+        <div style="font-family:var(--font-display);font-weight:300;font-size:13px;letter-spacing:.1em;opacity:.85;">SUNUM AKIŞI</div>
+        <div style="font-family:var(--font-display);font-weight:300;font-size:58px;letter-spacing:-.02em;line-height:1.05;margin-top:12px;">İçerik<br>Haritası</div>
+        <img src="assets/inbound-o-white.png" style="position:absolute;left:44px;bottom:40px;width:36px;height:36px;">
+      </div>
+      <div style="padding:58px 56px;display:flex;flex-direction:column;justify-content:space-between;">
+        <div><div style="font-family:var(--font-body);font-weight:300;font-size:17px;color:var(--teal);opacity:.6;">01</div><div style="font-family:var(--font-display);font-weight:700;font-size:23px;color:var(--teal);">Genel Görünüm</div><div style="font-size:13px;color:var(--ink-2);">Hacim, ciro, dönüşüm ve aylık seyir</div></div>
+        <div><div style="font-family:var(--font-body);font-weight:300;font-size:17px;color:var(--teal);opacity:.6;">02</div><div style="font-family:var(--font-display);font-weight:700;font-size:23px;color:var(--teal);">Trafik Nereye Gidiyor</div><div style="font-size:13px;color:var(--ink-2);">Sayfa tipi, en değerli sayfalar, marka merceği</div></div>
+        <div><div style="font-family:var(--font-body);font-weight:300;font-size:17px;color:var(--teal);opacity:.6;">03</div><div style="font-family:var(--font-display);font-weight:700;font-size:23px;color:var(--teal);">Fırsat & llms.txt</div><div style="font-size:13px;color:var(--ink-2);">Dönüşmeyen sayfalar ve llms.txt etkisi</div></div>
+        <div><div style="font-family:var(--font-body);font-weight:300;font-size:17px;color:var(--teal);opacity:.6;">04</div><div style="font-family:var(--font-display);font-weight:700;font-size:23px;color:var(--teal);">Sonraki Adımlar</div><div style="font-size:13px;color:var(--ink-2);">Değerlendirilebilir aksiyon alanları</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Separator 01 -->
+  <section data-screen-label="03 Bölüm 01">
+    <div class="slide dark" style="display:flex;align-items:center;justify-content:center;">
+      <div style="position:absolute;left:-60px;bottom:-40px;font-family:var(--font-display);font-weight:700;font-size:500px;color:#1A4238;line-height:1;">01</div>
+      <div style="text-align:center;position:relative;">
+        <div class="accent-line" style="margin:0 auto 30px;"></div>
+        <h1 style="color:#fff;font-size:60px;">Genel Görünüm</h1>
+        <div class="accent-line" style="margin:30px auto 0;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 KPI -->
+  <section data-screen-label="04 KPI">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Genel Görünüm</span><span class="sep">|</span><span class="title">Tek bakışta tablo</span></div>
+      <div style="padding:88px 60px 24px;display:grid;grid-template-columns:34% 1fr;gap:44px;">
+        <div>
+          <h1 style="font-size:38px;">Tek bakışta <span class="hl">tablo</span></h1>
+          <p style="margin-top:16px;font-size:14px;color:var(--ink-2);">Kasım 2025 – Haziran 2026 döneminde yapay zeka kaynaklı (ağırlıkla ChatGPT) referral trafiğinin özeti. Rakamlar bağlamda değerlendirildiğinde dikkat çekmektedir.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v">38.237</div><div class="l">AI Oturum</div></div>
+          <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v">₺639<small>K</small></div><div class="l">Toplam Ciro</div></div>
+          <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v">251</div><div class="l">Transaction</div></div>
+          <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v">₺2.544</div><div class="l">AOV (işlem başına)</div></div>
+        </div>
+      </div>
+      <ul class="insight-list" style="padding:0 60px;margin-top:8px;column-count:2;column-gap:40px;">
+        <li>En yüksek oturum hacmi <b class="acc">Mayıs 2026</b> ayında (7.575 oturum) gözlemlenmektedir; dönüşüm oranı <b class="acc">%0,66</b> düzeyindedir.</li>
+        <li>Trafiğin büyük bölümü <b class="acc">ürün sayfalarına</b> yönelmekte, ciro tarafında ise sepet ve onay adımları öne çıkmaktadır.</li>
+      </ul>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 05 Aylık trend -->
+  <section data-screen-label="05 Aylık trend">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Genel Görünüm</span><span class="sep">|</span><span class="title">Aylık seyir</span></div>
+      <div style="padding:84px 60px 40px;">
+        <h1 style="font-size:34px;">Aylık AI trafik <span class="hl">eğrisi</span></h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;">Bar: aylık oturum · turuncu etiket: aylık ciro. Şubat 2026 ayında <span class="llms-badge">✦ llms.txt</span> eklenmiştir. Haziran taralı bar kısmi dönemi gösterir.</p>
+        <div class="bars">
+          <div class="col"><div class="val">5.264</div><div class="rev">₺139K</div><div class="bar" style="height:69.5%;"></div><div class="mon">Kas 25</div></div>
+          <div class="col"><div class="val">4.000</div><div class="rev">₺47K</div><div class="bar" style="height:52.8%;"></div><div class="mon">Ara 25</div></div>
+          <div class="col"><div class="val">4.703</div><div class="rev">₺38K</div><div class="bar" style="height:62.1%;"></div><div class="mon">Oca 26</div></div>
+          <div class="col"><div class="val">3.578</div><div class="rev">₺56K</div><div class="bar" style="height:47.2%;border-top:3px solid var(--teal);"></div><div class="mon" style="color:var(--coral-deep);font-weight:700;">Şub 26 ✦</div></div>
+          <div class="col"><div class="val">4.762</div><div class="rev">₺65K</div><div class="bar" style="height:62.9%;"></div><div class="mon">Mar 26</div></div>
+          <div class="col"><div class="val">4.988</div><div class="rev">₺90K</div><div class="bar" style="height:65.8%;"></div><div class="mon">Nis 26</div></div>
+          <div class="col"><div class="val">7.575</div><div class="rev">₺122K</div><div class="bar" style="height:100%;"></div><div class="mon">May 26</div></div>
+          <div class="col"><div class="val">3.367</div><div class="rev">₺82K</div><div class="bar partial" style="height:44.4%;"></div><div class="mon">Haz 26*</div></div>
+        </div>
+      </div>
+      <ul class="insight-list" style="padding:0 60px;margin-top:0;column-count:2;column-gap:40px;">
+        <li>Kasım'dan Mayıs'a oturum hacminde <b class="pos">genel bir yükseliş</b> eğilimi gözlemlenmektedir.</li>
+        <li>Haziran <b class="acc">kısmi dönem</b> olduğundan ay sonu değerleri farklılaşabilir; karşılaştırma buna göre yorumlanabilir.</li>
+      </ul>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 06 Separator 02 -->
+  <section data-screen-label="06 Bölüm 02">
+    <div class="slide dark" style="display:flex;align-items:center;justify-content:center;">
+      <div style="position:absolute;left:-60px;bottom:-40px;font-family:var(--font-display);font-weight:700;font-size:500px;color:#1A4238;line-height:1;">02</div>
+      <div style="text-align:center;position:relative;">
+        <div class="accent-line" style="margin:0 auto 30px;"></div>
+        <h1 style="color:#fff;font-size:60px;">Trafik Nereye Gidiyor</h1>
+        <div class="accent-line" style="margin:30px auto 0;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 Sayfa tipi -->
+  <section data-screen-label="07 Sayfa tipi">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Trafik Nereye Gidiyor</span><span class="sep">|</span><span class="title">Sayfa tipi dağılımı</span></div>
+      <div style="padding:84px 60px 70px;">
+        <h1 style="font-size:34px;">Sayfa tipine göre <span class="hl">dağılım</span></h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;max-width:760px;">AI oturumlarının ve cironun sayfa tipine göre kırılımı. Renklendirme oturum payına göre hücre düzeyinde uygulanmıştır.</p>
+        <div style="display:grid;grid-template-columns:60% 1fr;gap:36px;margin-top:22px;">
+          <table class="ptbl">
+            <thead><tr><th>Sayfa Tipi</th><th class="n">Oturum</th><th class="n">Pay</th><th class="n">Ciro</th><th class="n">Transaction</th></tr></thead>
+            <tbody>
+              <tr><td>Ürün</td><td class="n">29.328</td><td class="n" style="background:#FFCDD2;color:#B23;font-family:var(--font-display);font-weight:700;">%76,7</td><td class="n">₺460.842</td><td class="n">187</td></tr>
+              <tr><td>Market</td><td class="n">7.193</td><td class="n" style="background:#FFE3D8;font-weight:700;">%18,8</td><td class="n">₺10.642</td><td class="n">9</td></tr>
+              <tr><td>Kategori</td><td class="n">952</td><td class="n">%2,5</td><td class="n" style="background:#C8E6C9;color:#2E7D32;font-family:var(--font-display);font-weight:700;">₺109.758</td><td class="n">40</td></tr>
+              <tr><td>Sepet / Checkout</td><td class="n">235</td><td class="n">%0,6</td><td class="n">₺49.730</td><td class="n">13</td></tr>
+              <tr><td>Anasayfa</td><td class="n">173</td><td class="n">%0,5</td><td class="n">₺0</td><td class="n">0</td></tr>
+              <tr><td>Marka</td><td class="n">162</td><td class="n">%0,4</td><td class="n">₺0</td><td class="n">0</td></tr>
+            </tbody>
+          </table>
+          <ul class="insight-list">
+            <li>AI trafiğinin <b class="acc">%76,7</b>'si ürün sayfalarına yönelmektedir; kanalın ürün keşfi odaklı çalıştığı değerlendirilebilir.</li>
+            <li>Kategori sayfaları oturumun yalnızca <b class="acc">%2,5</b>'ini oluştururken ciroda <b class="pos">₺109.758</b> ile öne çıkmakta, oturum başına değeri yüksek görünmektedir.</li>
+            <li>Market sayfaları hacimli (<b class="acc">%18,8</b>) fakat ciro katkısı görece sınırlıdır.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 08 En değerli sayfalar -->
+  <section data-screen-label="08 En değerli sayfalar">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Trafik Nereye Gidiyor</span><span class="sep">|</span><span class="title">En değerli sayfalar</span></div>
+      <div style="padding:84px 60px 50px;">
+        <h1 style="font-size:34px;">En değerli <span class="hl">sayfalar</span></h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;">Üç ayrı perspektiften öne çıkan sayfalar. <span class="llms-badge">✦ llms.txt</span> işareti ilgili listede yer alan sayfaları gösterir.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:22px;">
+          <div class="col-card">
+            <h4><span class="tag">En çok oturum</span>Trafik</h4>
+            <ul class="minilist">
+              <li><span class="nm">philips su arıtma</span><span class="vv">317</span></li>
+              <li><span class="nm">/magaza</span><span class="vv">235</span></li>
+              <li><span class="nm">sjcam aksiyon kamera</span><span class="vv">195</span></li>
+              <li><span class="nm">anasayfa</span><span class="vv">173</span></li>
+              <li><span class="nm">özdilek point seti</span><span class="vv">98</span></li>
+            </ul>
+          </div>
+          <div class="col-card">
+            <h4><span class="tag">En çok ciro · ürün</span>Ciro</h4>
+            <ul class="minilist">
+              <li><span class="nm">fissler vitavit prem.</span><span class="vv">₺20,0K</span></li>
+              <li><span class="nm">fissler vitaquick</span><span class="vv">₺16,0K</span></li>
+              <li><span class="nm">fissler vitavit mat</span><span class="vv">₺14,0K</span></li>
+              <li><span class="nm">özdilek pike takımı</span><span class="vv">₺11,9K</span></li>
+              <li><span class="nm">stanley termos</span><span class="vv">₺5,1K</span></li>
+            </ul>
+          </div>
+          <div class="col-card">
+            <h4><span class="tag">En çok işlem · ürün</span>Transaction</h4>
+            <ul class="minilist">
+              <li><span class="nm">stanley termos</span><span class="vv">3</span></li>
+              <li><span class="nm">sjcam kamera</span><span class="vv">2</span></li>
+              <li><span class="nm">fissler serisi</span><span class="vv">1+</span></li>
+              <li><span class="nm">özdilek pike</span><span class="vv">1</span></li>
+              <li><span class="nm">market ürünleri</span><span class="vv">1+</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <ul class="insight-list" style="padding:0 60px;">
+        <li>Cironun önemli bölümü <b class="acc">sepet ve onay adımlarında</b> toplanmakta; ürün düzeyinde <b class="acc">Fissler düdüklü tencere</b> serisi ve <b class="acc">Stanley termos</b> öne çıkmaktadır.</li>
+      </ul>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 09 Marka merceği -->
+  <section data-screen-label="09 Marka">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Trafik Nereye Gidiyor</span><span class="sep">|</span><span class="title">Marka merceği</span></div>
+      <div style="padding:84px 60px 50px;display:grid;grid-template-columns:1fr 34%;gap:44px;">
+        <div>
+          <h1 style="font-size:34px;">Marka <span class="hl">merceği</span></h1>
+          <p style="font-size:13px;color:var(--ink-2);margin:8px 0 22px;">Oturuma göre öne çıkan markalar (ürün slug ve marka sayfalarından türetilmiştir).</p>
+          <div class="bbar-row"><span class="nm">Özdilek</span><span class="track"><span class="fill" style="width:100%;"></span></span><span class="vv">1.823</span></div>
+          <div class="bbar-row"><span class="nm">Mavi</span><span class="track"><span class="fill" style="width:71%;"></span></span><span class="vv">1.299</span></div>
+          <div class="bbar-row"><span class="nm">Adidas</span><span class="track"><span class="fill" style="width:68%;"></span></span><span class="vv">1.232</span></div>
+          <div class="bbar-row"><span class="nm">Skechers</span><span class="track"><span class="fill" style="width:48%;"></span></span><span class="vv">867</span></div>
+          <div class="bbar-row"><span class="nm">Philips</span><span class="track"><span class="fill" style="width:46%;"></span></span><span class="vv">847</span></div>
+          <div class="bbar-row"><span class="nm">Pierre Cardin</span><span class="track"><span class="fill" style="width:33%;"></span></span><span class="vv">610</span></div>
+          <div class="bbar-row"><span class="nm">Calvin Klein</span><span class="track"><span class="fill" style="width:32%;"></span></span><span class="vv">588</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:center;">
+          <ul class="insight-list">
+            <li><b class="acc">Özdilek</b> kendi markalı ürünleriyle en yüksek AI oturumunu almaktadır.</li>
+            <li>Moda tarafında <b class="acc">Mavi, Adidas, Skechers</b>; elektronik tarafında <b class="acc">Philips</b> öne çıkmaktadır.</li>
+            <li>Marka kapsamının ürün slug sözlüğü genişletilerek derinleştirilmesi değerlendirilebilir.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 10 Separator 03 -->
+  <section data-screen-label="10 Bölüm 03">
+    <div class="slide dark" style="display:flex;align-items:center;justify-content:center;">
+      <div style="position:absolute;left:-60px;bottom:-40px;font-family:var(--font-display);font-weight:700;font-size:500px;color:#1A4238;line-height:1;">03</div>
+      <div style="text-align:center;position:relative;">
+        <div class="accent-line" style="margin:0 auto 30px;"></div>
+        <h1 style="color:#fff;font-size:60px;">Fırsat & llms.txt</h1>
+        <div class="accent-line" style="margin:30px auto 0;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 Dönüşmeyen sayfalar -->
+  <section data-screen-label="11 Dönüşmeyen">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Fırsat & llms.txt</span><span class="sep">|</span><span class="title">Dönüşmeyen sayfalar</span></div>
+      <div style="padding:84px 60px 70px;">
+        <h1 style="font-size:34px;">AI oturumu yüksek, <span class="hl">dönüşmeyen</span> sayfalar</h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;max-width:780px;">Belirgin AI oturumu alan fakat henüz transaction ile sonuçlanmayan sayfalar. İçerik ve dönüşüm akışının gözden geçirilmesiyle değerlendirilebilir fırsat alanı sunmaktadır.</p>
+        <div style="display:grid;grid-template-columns:58% 1fr;gap:36px;margin-top:22px;">
+          <table class="ptbl">
+            <thead><tr><th>Sayfa</th><th>Tip</th><th class="n">Oturum</th><th class="n">İşlem</th></tr></thead>
+            <tbody>
+              <tr><td>philips su arıtma cihazı</td><td>Ürün</td><td class="n">317</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+              <tr><td>anasayfa</td><td>Anasayfa</td><td class="n">173</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+              <tr><td>özdilek point happy aile seti</td><td>Ürün</td><td class="n">98</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+              <tr><td>philips hava temizleme cihazı</td><td>Ürün</td><td class="n">67</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+              <tr><td>acton pocket camera gimbal</td><td>Ürün</td><td class="n">62</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+              <tr><td>acton selfie aksiyon kamerası</td><td>Ürün</td><td class="n">54</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+            </tbody>
+          </table>
+          <ul class="insight-list">
+            <li><b class="acc">Philips</b> ürün sayfaları yüksek ilgi görmekte fakat işleme dönüşmemektedir; fiyat, stok ve içerik bütünlüğü değerlendirilebilir.</li>
+            <li><b class="acc">Acton</b> kamera ürünleri tekrarlı şekilde listede yer almakta, bu ürün grubu için ayrı bir bakış faydalı olabilir.</li>
+            <li>Anasayfa girişlerinin ilgili kategori ve ürünlere yönlendirme akışı gözden geçirilebilir.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 12 llms.txt etkisi -->
+  <section data-screen-label="12 llms.txt">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Fırsat & llms.txt</span><span class="sep">|</span><span class="title">llms.txt etkisi</span></div>
+      <div style="padding:84px 60px 50px;">
+        <h1 style="font-size:34px;">llms.txt <span class="hl">etkisi</span></h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;max-width:830px;">llms.txt dosyası Şubat 2026'da eklenmiştir; "Önemli Sayfalar" altında 83 sayfa tanımlıdır, bunlardan 62'si AI trafiği verisinde gözlemlenmektedir. Aşağıda Şubat öncesi ve sonrası AI oturum karşılaştırması yer almaktadır.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-top:26px;align-items:center;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v" style="font-size:42px;">37</div><div class="l">llms.txt · Şubat öncesi</div></div>
+            <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v" style="font-size:42px;">40</div><div class="l">llms.txt · Şubat sonrası</div></div>
+            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:42px;">13.930</div><div class="l">Diğer · Şubat öncesi</div></div>
+            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:42px;">24.230</div><div class="l">Diğer · Şubat sonrası</div></div>
+          </div>
+          <ul class="insight-list">
+            <li>llms.txt sayfaları ağırlıkla <b class="acc">kategori</b> niteliğindedir; bu sayfalardaki AI oturumu bu dönemde sınırlı seyretmektedir (<b class="acc">37 → 40</b>).</li>
+            <li>AI trafiğindeki büyüme ise ağırlıkla <b class="acc">ürün sayfalarında</b> gözlemlenmektedir (diğer sayfalar <b class="pos">13.930 → 24.230</b>).</li>
+            <li>llms.txt etkisinin daha sağlıklı ölçülebilmesi için kapsamın <b class="acc">öne çıkan ürün sayfalarıyla</b> genişletilmesi ve takibin sürdürülmesi değerlendirilebilir.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · llms.txt</div>
+    </div>
+  </section>
+
+  <!-- 13 Sonraki adımlar -->
+  <section data-screen-label="13 Sonraki adımlar">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Sonraki Adımlar</span><span class="sep">|</span><span class="title">Değerlendirilebilir alanlar</span></div>
+      <div style="padding:84px 60px 60px;">
+        <h1 style="font-size:34px;">Sonraki <span class="hl">adımlar</span></h1>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px;">
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">01</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">Dönüşüm akışı</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">Yüksek AI oturumu alan ürün sayfalarında fiyat, stok ve içerik bütünlüğünün değerlendirilmesi.</p></div>
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">02</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">llms.txt kapsamı</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">Öne çıkan ürün sayfalarının llms.txt kapsamına eklenmesi ve etkisinin zaman içinde takibi.</p></div>
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">03</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">Arama hacmi & sezonsallık</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">İlgili kategori ve markaların güncel arama hacmiyle zenginleştirilmesi (opsiyonel aşama).</p></div>
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">04</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">Sürekli takip</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">Aylık AI trafik raporunun düzenli güncellenmesi ve kanal performansının izlenmesi.</p></div>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+    </div>
+  </section>
+
+  <!-- 14 Kapanış -->
+  <section data-screen-label="14 Kapanış">
+    <div class="slide coral" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <img src="assets/inbound-big-o-white.png" style="position:absolute;left:-140px;top:-100px;height:1200px;opacity:.14;">
+      <div style="text-align:center;position:relative;">
+        <div class="accent-line" style="background:#fff;margin:0 auto 30px;"></div>
+        <h1 style="font-family:var(--font-display);font-weight:300;font-size:96px;color:#fff;letter-spacing:-.02em;">Teşekkürler</h1>
+        <div class="accent-line" style="background:#fff;margin:30px auto 0;"></div>
+        <div style="font-family:var(--font-body);font-size:16px;color:#fff;opacity:.9;margin-top:38px;">welcome@inbound.com.tr</div>
+        <div style="font-family:var(--font-body);font-size:11px;color:#fff;opacity:.7;margin-top:8px;letter-spacing:.04em;">Özdilekteyim × Inbound · AI Trafik Analizi · © 2026 Inbound</div>
+      </div>
+    </div>
+  </section>
+
+</deck-stage>
+</body>
+</html>

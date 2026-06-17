@@ -1,0 +1,276 @@
+/* ============================================================
+   Inbound Design System - Core Tokens
+   Colors, type scale, and semantic CSS variables.
+   ============================================================ */
+
+/* ---------- Fonts ---------- */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('fonts/BricolageGrotesque-Light.ttf') format('truetype');
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('fonts/BricolageGrotesque-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('fonts/BricolageGrotesque-Medium.ttf') format('truetype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('fonts/BricolageGrotesque-SemiBold.ttf') format('truetype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('fonts/BricolageGrotesque-Bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('fonts/BricolageGrotesque-ExtraBold.ttf') format('truetype');
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('fonts/Outfit-Light.ttf') format('truetype');
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Outfit';
+  src: url('fonts/Outfit-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Outfit';
+  src: url('fonts/Outfit-Medium.ttf') format('truetype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Outfit';
+  src: url('fonts/Outfit-SemiBold.ttf') format('truetype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Outfit';
+  src: url('fonts/Outfit-Bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Outfit';
+  src: url('fonts/Outfit-ExtraBold.ttf') format('truetype');
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+
+:root {
+  /* ---------- Brand colors ---------- */
+  --coral:        #FF7B52;   /* primary brand / accents / CTA bg */
+  --coral-tint:   #FFE3D8;   /* soft coral wash, pill hover, bg tint */
+  --coral-deep:   #E85F36;   /* hover/pressed coral */
+  --teal:         #10332F;   /* ink - headings + body */
+  --teal-soft:    #1A4238;   /* separator faded numeral, hover teal */
+  --mint:         #E8F5E9;   /* alt panel bg, success wash */
+
+  /* ---------- Neutrals ---------- */
+  --white:        #FFFFFF;
+  --off-white:    #FAF8F5;   /* rarely used - decks require pure white */
+  --ink:          #10332F;   /* = teal; semantic alias for body copy */
+  --ink-2:        #4A4A4A;   /* secondary copy, captions */
+  --ink-3:        #8A8A8A;   /* tertiary, metadata */
+  --line:         #E0E0E0;   /* borders, table dividers */
+  --line-soft:    #F0EDE8;   /* decorative grid lines on slides */
+
+  /* ---------- Data-viz / state ---------- */
+  --red:          #D32F2F;   /* negative, footnotes */
+  --red-wash:     #FFCDD2;   /* neg table cell */
+  --green:        #2E7D32;   /* positive */
+  --green-wash:   #C8E6C9;   /* pos table cell */
+  --gold:         #F5A623;   /* bar chart - previous period */
+  --gray-bar:     #4A4A4A;   /* bar chart - current period */
+  --trend-red:    #E53935;   /* line overlay */
+
+  /* ---------- Foreground / background semantics ---------- */
+  --fg-1: var(--teal);       /* strongest copy */
+  --fg-2: var(--ink-2);       /* secondary copy */
+  --fg-3: var(--ink-3);       /* tertiary copy */
+  --fg-accent: var(--coral);
+  --fg-inverse: var(--white);
+
+  --bg-1: var(--white);       /* default slide / page background */
+  --bg-2: var(--off-white);   /* subtle section contrast */
+  --bg-accent: var(--coral);  /* cover, closing, agenda left panel */
+  --bg-ink: var(--teal);      /* section separator */
+  --bg-mint: var(--mint);
+
+  /* ---------- Type families ---------- */
+  --font-display: 'Bricolage Grotesque', 'Calibri', system-ui, sans-serif;
+  --font-body:    'Outfit', 'Calibri', system-ui, sans-serif;
+
+  /* ---------- Type scale (slide punto → web px) ---------- */
+  /* Display */
+  --t-cover:       clamp(44px, 5.6vw, 72px);     /* cover / closing */
+  --t-section:     clamp(36px, 3.8vw, 56px);     /* separator title */
+  --t-section-num: clamp(140px, 14vw, 220px);    /* big numeral */
+  --t-h1:          clamp(36px, 3vw, 48px);       /* page hero */
+  --t-h2:          clamp(28px, 2.4vw, 36px);     /* slide title */
+  --t-h3:          clamp(22px, 1.6vw, 26px);     /* card title */
+  --t-h4:          18px;
+
+  /* Body */
+  --t-lead:   18px;
+  --t-body:   16px;
+  --t-sm:     14px;
+  --t-xs:     12px;
+  --t-micro:  10px;
+
+  /* Data / KPI */
+  --t-kpi:     clamp(40px, 4.2vw, 60px);
+  --t-metric:  clamp(24px, 2vw, 32px);
+
+  /* ---------- Leading ---------- */
+  --lh-tight:   1.05;
+  --lh-display: 1.1;
+  --lh-snug:    1.25;
+  --lh-body:    1.5;
+  --lh-loose:   1.65;
+
+  /* ---------- Letter spacing ---------- */
+  --ls-display: -0.02em;
+  --ls-tight:   -0.01em;
+  --ls-normal:   0;
+  --ls-caps:    0.08em;
+  --ls-micro:   0.04em;
+
+  /* ---------- Radii (matches .15"/.2" slide radii) ---------- */
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;        /* card default */
+  --r-xl: 20px;        /* image panels */
+  --r-pill: 999px;
+
+  /* ---------- Spacing (8pt baseline) ---------- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --s-16: 64px;
+  --s-20: 80px;
+  --s-24: 96px;
+
+  /* ---------- Elevation ---------- */
+  --shadow-card: 0 2px 8px rgba(16, 51, 47, 0.08);
+  --shadow-card-hover: 0 6px 20px rgba(16, 51, 47, 0.12);
+  --shadow-pop: 0 12px 32px rgba(16, 51, 47, 0.16);
+  --shadow-inner: inset 0 0 0 1px rgba(16, 51, 47, 0.06);
+
+  /* ---------- Motion ---------- */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+}
+
+/* ============================================================
+   Semantic element styles - apply via class for isolation
+   ============================================================ */
+.inbound-root, body.inbound {
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  color: var(--fg-1);
+  background: var(--bg-1);
+  -webkit-font-smoothing: antialiased;
+}
+
+.inbound h1, .h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-h1);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  color: var(--fg-1);
+}
+.inbound h2, .h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-h2);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  color: var(--fg-1);
+}
+.inbound h3, .h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-h3);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-tight);
+  color: var(--fg-1);
+}
+.inbound h4, .h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--t-h4);
+  line-height: var(--lh-snug);
+  color: var(--fg-1);
+}
+.inbound p, .body { font-size: var(--t-body); line-height: var(--lh-body); color: var(--fg-1); }
+.inbound .lead, .lead { font-size: var(--t-lead); line-height: var(--lh-body); color: var(--fg-1); }
+.inbound small, .small, .caption { font-size: var(--t-sm); color: var(--fg-2); }
+.inbound .micro { font-size: var(--t-xs); color: var(--fg-2); letter-spacing: var(--ls-micro); }
+
+/* Highlights - the signature coral underline block */
+.highlight-coral {
+  background: linear-gradient(to top, var(--coral) 28%, transparent 28%);
+  padding: 0 .06em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.accent-coral { color: var(--coral); }
+.accent-teal  { color: var(--teal); }
+
+/* Breadcrumb (slide header) */
+.breadcrumb {
+  display: inline-flex; gap: 6px; align-items: baseline;
+  font-size: var(--t-xs);
+  color: var(--coral);
+}
+.breadcrumb .section { font-family: var(--font-display); font-weight: 700; }
+.breadcrumb .sep { opacity: .7; }
+.breadcrumb .title { font-family: var(--font-body); font-weight: 400; opacity: .9; }
+
+/* Source pill */
+.source-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--coral); color: var(--white);
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--t-micro);
+  padding: 6px 10px; border-radius: var(--r-sm);
+}
+
+/* Insight arrow bullets */
+.insight-list { list-style: none; padding: 0; margin: 0; }
+.insight-list li { position: relative; padding-left: 22px; margin-bottom: 14px; font-size: var(--t-sm); line-height: var(--lh-body); }
+.insight-list li::before {
+  content: "➔"; position: absolute; left: 0; top: 0;
+  color: var(--teal); font-family: var(--font-body);
+}
+
+/* Utility: decorative vertical grid lines */
+.slide-gridlines {
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0, transparent calc(20% - 0.5px),
+    var(--line-soft) calc(20% - 0.5px), var(--line-soft) 20%
+  );
+}
