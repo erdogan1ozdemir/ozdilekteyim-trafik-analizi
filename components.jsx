@@ -49,7 +49,7 @@
 
   // ——— Yeni KPI kartları: gradient/gölge + opsiyonel sparkline (sol bar YOK) ———
   function KpiStrip({items, cols}) {
-    return h('div', { className:'kpi2-grid', style:{gridTemplateColumns:`repeat(${cols||items.length}, 1fr)`} },
+    return h('div', { className:'kpi2-grid', style:{gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))'} },
       items.map((it,i) => {
         const c = it.color || 'var(--accent)';
         let sp = null;
@@ -192,7 +192,7 @@
         plugins:{ legend:{display:false}, datalabels:{display:false},
           tooltip:{callbacks:{label:c=>c.label+': '+AU.METRICS[metric].fmt(c.parsed)+' ('+(c.parsed/total*100).toFixed(1)+'%)'}} } } });
     const selSet = selected && selected.length ? new Set(selected) : null;
-    return h('div', { style:{display:'grid', gridTemplateColumns:'minmax(220px,42%) 1fr', gap:'22px', alignItems:'center'} },
+    return h('div', { style:{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(300px,1fr))', gap:'22px', alignItems:'center'} },
       h(ChartCanvas, { buildConfig:build, deps:[metric, groups, selected], height:height||320 }),
       h('div', { className:'brand-legend' },
         h('div', { className:'bl-head' }, h('span',null,''), h('span',null,'Marka'), h('span',null,'Oturum'), h('span',null,'Ciro'), h('span',null,'Tx')),
@@ -206,10 +206,12 @@
     );
   }
 
-  // ——— sortable + tıklanabilir tablo ———
-  function DataTable({columns, rows, initialSort, maxRows, onRowClick, activeKey, keyOf}) {
+  // ——— sortable + tıklanabilir tablo (artımlı sayfalama ile) ———
+  function DataTable({columns, rows, initialSort, maxRows, onRowClick, activeKey, keyOf, pageSize}) {
+    const PS = pageSize || 60;
     const [sort, setSort] = useState(initialSort || { key: columns[0].key, dir:'desc' });
-    const sorted = useMemo(() => {
+    const [shown, setShown] = useState(PS);
+    const sortedAll = useMemo(() => {
       const col = columns.find(c=>c.key===sort.key);
       const getv = (r)=> col && col.get ? col.get(r) : r[sort.key];
       const arr = [...rows].sort((a,b)=>{ const va=getv(a), vb=getv(b);
@@ -217,21 +219,31 @@
         return sort.dir==='asc'?String(va).localeCompare(String(vb),'tr'):String(vb).localeCompare(String(va),'tr'); });
       return maxRows ? arr.slice(0, maxRows) : arr;
     }, [rows, sort, maxRows]);
+    useEffect(()=>{ setShown(PS); }, [rows, sort.key, sort.dir]); // filtre/sıralama değişince başa dön
+    const sorted = sortedAll.slice(0, shown);
     function hdrClick(c){ if (c.sortable===false) return; setSort(s => ({key:c.key, dir: s.key===c.key && s.dir==='desc'?'asc':'desc'})); }
-    return h('div', { className:'tbl-wrap' },
-      h('table', { className:'tbl' },
-        h('thead', null, h('tr', null, columns.map(c =>
-          h('th', { key:c.key, onClick:()=>hdrClick(c), style:{cursor:c.sortable===false?'default':'pointer', textAlign:c.align||'left', whiteSpace:'nowrap'} },
-            c.label, sort.key===c.key ? h('span',{style:{marginLeft:'4px',color:'var(--accent)'}}, sort.dir==='asc'?'▲':'▼') : null))
-        )),
-        h('tbody', null, sorted.map((r,i) => {
-          const k = keyOf ? keyOf(r) : i;
-          const active = activeKey!=null && k===activeKey;
-          return h('tr', { key:i, className:(onRowClick?'row-clickable ':'')+(active?'row-active':''), onClick: onRowClick?()=>onRowClick(r):undefined },
-            columns.map(c => h('td', { key:c.key, className:c.align==='right'?'num':'', style:{textAlign:c.align||'left'} },
-              c.render ? c.render(r) : (c.get ? c.get(r) : r[c.key]))));
-        }))
-      )
+    const rest = sortedAll.length - shown;
+    return h('div', null,
+      h('div', { className:'tbl-wrap' },
+        h('table', { className:'tbl' },
+          h('thead', null, h('tr', null, columns.map(c =>
+            h('th', { key:c.key, onClick:()=>hdrClick(c), style:{cursor:c.sortable===false?'default':'pointer', textAlign:c.align||'left', whiteSpace:'nowrap'} },
+              c.label, sort.key===c.key ? h('span',{style:{marginLeft:'4px',color:'var(--accent)'}}, sort.dir==='asc'?'▲':'▼') : null))
+          )),
+          h('tbody', null, sorted.map((r,i) => {
+            const k = keyOf ? keyOf(r) : i;
+            const active = activeKey!=null && k===activeKey;
+            return h('tr', { key:i, className:(onRowClick?'row-clickable ':'')+(active?'row-active':''), onClick: onRowClick?()=>onRowClick(r):undefined },
+              columns.map(c => h('td', { key:c.key, className:c.align==='right'?'num':'', style:{textAlign:c.align||'left'} },
+                c.render ? c.render(r) : (c.get ? c.get(r) : r[c.key]))));
+          }))
+        )
+      ),
+      rest>0 ? h('div', { className:'tbl-more' },
+        h('span',{style:{fontSize:'12px',color:'var(--ink-3)',marginRight:'10px'}}, sorted.length+' / '+sortedAll.length+' satır'),
+        h('button', { className:'chip-btn', onClick:()=>setShown(s=>s+PS) }, 'Daha fazla göster (+'+Math.min(PS,rest)+')'),
+        rest>PS ? h('button', { className:'chip-btn', style:{marginLeft:'6px'}, onClick:()=>setShown(sortedAll.length) }, 'Tümünü göster ('+U.fmtFull(sortedAll.length)+')') : null
+      ) : null
     );
   }
 

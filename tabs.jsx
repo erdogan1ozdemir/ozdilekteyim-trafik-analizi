@@ -198,10 +198,8 @@
   // ============ 4. LANDING PAGE ============
   function LandingPages({rows, filters, setFilters, selectedLp, setSelectedLp}) {
     const [metric, setMetric] = useState('sessions');
-    const [showAll, setShowAll] = useState(false);
     const filtered = useMemo(()=>AU.applyFilters(rows, filters), [rows, filters]);
     const data = useMemo(()=>groupLP(filtered), [filtered]);
-    const CAP = 100;
     const chartRows = selectedLp ? AU.ROWS.filter(r=>r.lp===selectedLp) : filtered;
     const cols = [
       {key:'lp', label:'Landing Page', get:r=>r.lp, sortable:false, render:lpCell}, brandCol,
@@ -225,10 +223,8 @@
       h(ExportSection, { id:'sec-lp', title:'Landing Page Tablosu — '+AU.METRICS[metric].short,
         desc:'Excel\'deki tüm sayfalar tekilleştirilmiş haldedir (toplamda oturum almış '+data.length+' sayfa). Bir satıra tıklayınca üstteki grafik o sayfanın akışına döner. ✦ llms işareti llms.txt sayfalarını gösterir.',
         pngName:'ozdilekteyim-ai-landing-page', csv:{rows:[...data].sort((a,b)=>b[metric]-a[metric]),headers:csvHeaders,name:'landing-pages'} },
-        h(DataTable, { columns:cols, rows:data, initialSort:{key:metric,dir:'desc'}, maxRows: showAll?undefined:CAP,
-          onRowClick:r=>setSelectedLp(selectedLp===r.lp?null:r.lp), activeKey:selectedLp, keyOf:r=>r.lp }),
-        data.length>CAP ? h('div',{style:{textAlign:'center',marginTop:'12px'}},
-          h('button',{className:'chip-btn',onClick:()=>setShowAll(s=>!s)}, showAll?('İlk '+CAP+' sayfayı göster'):('Tümünü göster ('+U.fmtFull(data.length)+' sayfa)'))) : null
+        h(DataTable, { columns:cols, rows:data, initialSort:{key:metric,dir:'desc'},
+          onRowClick:r=>setSelectedLp(selectedLp===r.lp?null:r.lp), activeKey:selectedLp, keyOf:r=>r.lp })
       )
     );
   }

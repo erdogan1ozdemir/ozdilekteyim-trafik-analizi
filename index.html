@@ -64,8 +64,7 @@
   .delta-neu { color: var(--ink-3); }
   .scope-note { font-size: 12px; color: var(--ink-3); background: var(--accent-wash);
     border-radius: var(--r-md); padding: 9px 13px; margin: 4px 0 14px; line-height: 1.5; }
-  .ai-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 860px){ .ai-grid-2 { grid-template-columns: 1fr; } }
+  .ai-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px,1fr)); gap: 16px; }
   .tbl-wrap { overflow-x: auto; }
   .seg-toggle { display: inline-flex; gap: 0; border: 1px solid var(--line); border-radius: var(--r-pill); overflow: hidden; }
   .seg-toggle button { font-size: 12px; font-weight: 600; padding: 6px 13px; border: none; background: var(--bg-card); color: var(--ink-3); cursor: pointer; }
@@ -94,8 +93,7 @@
   .kpi2 .k-spark { margin-top:9px; height:30px; }
 
   /* Özet mini-özet kartları */
-  .summary-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
-  @media (max-width:900px){ .summary-grid { grid-template-columns:1fr; } }
+  .summary-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(255px,1fr)); gap:16px; }
   .summary-card { background:var(--bg-card); border:1px solid var(--line); border-radius:var(--r-lg); padding:16px 18px;
     box-shadow:var(--shadow-card); cursor:pointer; transition:transform .15s, box-shadow .15s; }
   .summary-card:hover { box-shadow:var(--shadow-card-hover); transform:translateY(-2px); }
@@ -219,6 +217,47 @@
   .heatmap .hm-row-label.clickable, .heatmap .hm-cell.clickable { cursor:pointer; }
   .heatmap .hm-row-label.clickable:hover span { color:var(--accent-deep); }
   .heat-metric-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+
+  /* ===== v5: scroll performansı ===== */
+  /* A — sabit gradient arka plan kaldırıldı (her scroll karesinde repaint sebebiydi) */
+  body { background-image:none !important; background-attachment:scroll !important; }
+  /* B — global smooth scroll kapalı (ToC/sekme tıklamaları JS ile yine smooth çalışır) */
+  html { scroll-behavior:auto !important; }
+  /* C — tema butonundaki backdrop blur kaldırıldı */
+  .theme-toggle { backdrop-filter:none !important; }
+  /* D — ekran dışı bölümleri tembel render et (chart içermeyen bölümlerde) */
+  .ai-section:not(:has(canvas)) { content-visibility:auto; contain-intrinsic-size:auto 600px; }
+  .summary-card { content-visibility:auto; contain-intrinsic-size:auto 220px; }
+  /* "daha fazla" satır kontrolü */
+  .tbl-more { text-align:center; margin-top:12px; }
+
+  /* ===== v5: mobil / responsive ===== */
+  @media (max-width: 720px) {
+    .content { padding:14px 12px 70px; }
+    .topbar { padding:12px 14px; gap:10px; flex-wrap:wrap; }
+    .topbar .logo img { height:24px !important; }
+    .topbar .title-block .title { font-size:12px; }
+    .header-right { gap:8px; }
+    .theme-toggle { padding:6px 11px; font-size:11.5px; }
+    /* sekme barları yatay kaydırma */
+    .main-tabs, .tabs { flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    .main-tabs::-webkit-scrollbar, .tabs::-webkit-scrollbar { display:none; }
+    .tab, .main-tab { white-space:nowrap; flex:none; padding:11px 13px; font-size:13px; }
+    .kpi2 .k-value { font-size:22px; }
+    /* filtre satırı sar */
+    .filter-row { flex-direction:column; align-items:stretch; }
+    .filter-row .multiselect, .filter-row .search-box, .filter-row .search-box input { width:100% !important; }
+    .seg-toggle { width:100%; }
+    .seg-toggle button { flex:1; }
+    .ai-metric-legend { gap:6px; }
+    /* modal tam ekran */
+    .ai-modal { max-width:96vw !important; max-height:92vh; }
+    .ai-modal-body { padding:14px 14px 18px; }
+    /* başlık biraz küçült */
+    .ai-section > .card-header strong { font-size:16px; }
+    .ai-toc { position:static; }
+    /* ay filtresi yatay kaydırma yerine sar (zaten sarıyor) */
+  }
 </style>
 </head>
 <body>
