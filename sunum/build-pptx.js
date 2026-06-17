@@ -48,7 +48,7 @@ separator('01','Genel Görünüm');
 // 04 KPI
 s=p.addSlide(); s.background={color:WHITE}; breadcrumb(s,'Genel Görünüm','Tek bakışta tablo');
 title(s,[{text:'Tek bakışta '},hl('tablo')]);
-s.addText('Kasım 2025 – Haziran 2026 döneminde yapay zeka kaynaklı (ağırlıkla ChatGPT) referral trafiğinin özeti.',{x:0.5,y:1.55,w:12,h:0.4,fontFace:BF,fontSize:13,color:INK2});
+s.addText('Kasım 2025 – Haziran 2026 döneminde yapay zeka kaynaklı (ağırlıkla ChatGPT) referral trafiğinin özeti gösterilmektedir.',{x:0.5,y:1.55,w:12,h:0.4,fontFace:BF,fontSize:13,color:INK2});
 const kpis=[['38.237','Toplam AI Oturum',TEAL],['₺639K','Toplam Ciro',TEAL],['251','Transaction',CORAL],['₺2.544','AOV (işlem başına)',CORAL],['+%0,66','Dönüşüm (CR)',TEAL]];
 kpis.forEach((k,i)=>{ const w=2.3,gap=0.18,x=0.5+i*(w+gap),y=2.3; s.addShape(p.ShapeType.roundRect,{x,y,w,h:1.9,fill:{color:k[2]},rectRadius:0.12,line:{type:'none'}});
   s.addText(k[0],{x,y:y+0.35,w,h:0.8,fontFace:HF,fontSize:34,bold:true,color:WHITE,align:'center'});
@@ -56,18 +56,26 @@ kpis.forEach((k,i)=>{ const w=2.3,gap=0.18,x=0.5+i*(w+gap),y=2.3; s.addShape(p.S
 s.addText([{text:'➜  ',options:{color:CORAL,bold:true}},{text:'Kasım 2025',options:{bold:true,color:CORALD}},{text:' alışveriş kampanya dönemiyle (Efsane Cuma) güçlü bir başlangıç oluşturmuş; trafik sonraki aylarda yeniden Kasım seviyelerine yaklaşmış, '},{text:'Mayıs 2026',options:{bold:true,color:CORALD}},{text:'\'da bayram etkisiyle Kasım\'ı da aşmıştır.'}],{x:0.5,y:4.7,w:12.3,h:1,fontFace:BF,fontSize:14,color:INK,fill:{color:'FDEAE2'},align:'left',valign:'middle',margin:10});
 logoTeal(s); sourcePill(s,'Kaynak: GA4 · AI referral');
 
-// 05 AYLIK TREND (çift eksen line)
+// 05 AYLIK TREND (çift eksen line + aylık metrik tablosu)
 s=p.addSlide(); s.background={color:WHITE}; breadcrumb(s,'Genel Görünüm','Aylık seyir');
-title(s,[{text:'Aylık AI trafik '},hl('eğrisi')]);
+title(s,[{text:'Aylık AI\'dan gelen '},hl('trafik & ciro')]);
 const MON=['Kas 25','Ara 25','Oca 26','Şub 26','Mar 26','Nis 26','May 26','Haz 26'];
-const SESS=[5264,4000,4703,3578,4762,4988,7575,3367], REV=[138985,47020,37897,56242,65071,89865,121636,81874];
+const SESS=[5264,4000,4703,3578,4762,4988,7575,3367], REV=[138985,47020,37897,56242,65071,89865,121636,81874], TX=[33,26,15,19,30,44,54,30];
+const REVK=['₺139K','₺47K','₺38K','₺56K','₺65K','₺90K','₺122K','₺82K'];
+const SESSF=['5.264','4.000','4.703','3.578','4.762','4.988','7.575','3.367'];
 s.addChart([
   {type:p.ChartType.line,data:[{name:'Oturum',labels:MON,values:SESS}],options:{chartColors:[CORAL],lineSize:3,lineSmooth:true}},
   {type:p.ChartType.line,data:[{name:'Ciro (₺)',labels:MON,values:REV}],options:{chartColors:[GREEN],lineSize:3,lineSmooth:true,secondaryValAxis:true,secondaryCatAxis:true}}
-],{x:0.5,y:1.7,w:12.3,h:3.6,showLegend:true,legendPos:'t',legendFontFace:BF,
+],{x:0.5,y:1.55,w:12.3,h:2.55,showLegend:true,legendPos:'t',legendFontFace:BF,
    valAxes:[{valAxisLabelColor:CORAL,valGridLine:{style:'none'},valAxisLabelFontFace:BF},{valAxisLabelColor:GREEN,valGridLine:{style:'none'},valAxisLabelFontFace:BF}],
-   catAxes:[{catAxisLabelColor:INK2,catAxisLabelFontFace:BF,catAxisLabelFontSize:10},{catAxisHidden:true}]});
-s.addText([{text:'➜  ',options:{color:CORAL,bold:true}},{text:'Kasım',options:{bold:true,color:CORALD}},{text:' Efsane Cuma ile dönemin en yüksek cirosunu (₺139K) oluşturmuş; '},{text:'Mayıs',options:{bold:true,color:CORALD}},{text:' bayram dönemiyle Kasım\'ı da aşmıştır.'}],{x:0.5,y:5.6,w:12.3,h:0.7,fontFace:BF,fontSize:13,color:INK});
+   catAxes:[{catAxisLabelColor:INK2,catAxisLabelFontFace:BF,catAxisLabelFontSize:9},{catAxisHidden:true}]});
+// Aylık metrik tablosu (chart altında)
+const hdr=[{text:'',options:{fill:{color:TEAL}}}].concat(MON.map(m=>({text:m,options:{bold:true,color:WHITE,fill:{color:TEAL},align:'center',fontSize:10}})));
+const rOtr=[{text:'AI Oturum',options:{bold:true,color:CORALD}}].concat(SESSF.map(v=>({text:v,options:{align:'center',fontSize:11}})));
+const rRev=[{text:'Ciro',options:{bold:true,color:GREEN}}].concat(REVK.map(v=>({text:v,options:{align:'center',fontSize:11}})));
+const rTx=[{text:'Transaction',options:{bold:true,color:BLUE}}].concat(TX.map(v=>({text:String(v),options:{align:'center',fontSize:11}})));
+s.addTable([hdr,rOtr,rRev,rTx],{x:0.5,y:4.35,w:12.3,colW:[1.7].concat(Array(8).fill(1.325)),fontFace:BF,fontSize:11,color:INK,rowH:0.42,border:{type:'solid',color:LINE,pt:0.5},valign:'middle'});
+s.addText([{text:'➜  ',options:{color:CORAL,bold:true}},{text:'Kasım',options:{bold:true,color:CORALD}},{text:' Efsane Cuma ile dönemin en yüksek cirosunu (₺139K) oluşturmuş; '},{text:'Mayıs',options:{bold:true,color:CORALD}},{text:' bayram dönemiyle Kasım\'ı da aşmıştır. Haziran ayı bitmediği için chart düşüş gösterebilir.'}],{x:0.5,y:6.5,w:12.3,h:0.6,fontFace:BF,fontSize:12,color:INK});
 logoTeal(s); sourcePill(s,'Kaynak: GA4 · AI referral');
 
 // 06 BÖLÜM 02
