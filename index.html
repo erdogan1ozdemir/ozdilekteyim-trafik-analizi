@@ -1,0 +1,93 @@
+<!doctype html>
+<html data-theme="light" data-palette="coral" data-layout="tabs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
+<title>Özdilekteyim · AI Trafik Analizi</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+<script src="brand.config.js"></script>
+<script>
+  (function(){
+    var B = window.BRAND || {};
+    if (B.lang) document.documentElement.setAttribute('lang', B.lang);
+    document.title = [B.name, B.title].filter(Boolean).join(' · ') || 'Dashboard';
+    // Apply brand accent immediately so first paint is on-brand.
+    if (B.accent) {
+      var s = document.createElement('style');
+      s.textContent = ':root{--accent:'+B.accent+';--accent-deep:'+B.accent+';--accent-wash:color-mix(in srgb,'+B.accent+' 14%, white);}'
+        + '[data-theme="dark"]{--accent-wash:color-mix(in srgb,'+B.accent+' 22%, #141C1A);}';
+      document.head.appendChild(s);
+    }
+  })();
+</script>
+
+<!-- Supplementary styles for AI-traffic-specific components (prefixed .ai-*) -->
+<style>
+  .content { max-width: 1200px; margin: 0 auto; padding: 22px 24px 90px; }
+  .ai-toc { position: sticky; top: 78px; z-index: 30; display: flex; flex-wrap: wrap; gap: 6px;
+    background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+    padding: 8px 10px; margin-bottom: 18px; box-shadow: var(--shadow-card); }
+  .ai-toc a { font-size: 12px; font-weight: 600; color: var(--ink-2); text-decoration: none;
+    padding: 6px 11px; border-radius: var(--r-pill); transition: all .15s; white-space: nowrap; }
+  .ai-toc a:hover { background: var(--accent-wash); color: var(--accent-deep); }
+  .ai-toc a.active { background: var(--accent); color: #fff; }
+  .ai-section { scroll-margin-top: 150px; margin-bottom: 30px; }
+  .ai-card-tools { display: flex; gap: 6px; align-items: center; }
+  .png-btn { font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: var(--r-pill);
+    border: 1px solid var(--line); background: var(--bg-card); color: var(--ink-2); cursor: pointer; }
+  .png-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
+  .ai-metric-legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+  .ai-metric-legend .ml { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600;
+    padding: 6px 12px; border-radius: var(--r-pill); border: 1.5px solid var(--line); background: var(--bg-card);
+    color: var(--ink-3); cursor: pointer; user-select: none; transition: all .15s; }
+  .ai-metric-legend .ml .dot { width: 11px; height: 11px; border-radius: 3px; opacity: .35; }
+  .ai-metric-legend .ml.on { color: var(--ink); border-color: currentColor; }
+  .ai-metric-legend .ml.on .dot { opacity: 1; }
+  .ai-chart-wrap { position: relative; width: 100%; }
+  .ai-llms-badge { display: inline-flex; align-items: center; justify-content: center; gap: 3px;
+    font-size: 10px; font-weight: 700; line-height: 1; padding: 2px 6px; border-radius: var(--r-pill);
+    background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent-deep);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); margin-left: 7px; vertical-align: middle; cursor: help; }
+  .ai-ptype-bar { display: flex; height: 26px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+  .ai-ptype-bar span { display: block; height: 100%; }
+  .lp-cell { max-width: 420px; }
+  .lp-cell a { color: var(--ink); text-decoration: none; font-weight: 500; }
+  .lp-cell a:hover { color: var(--accent-deep); text-decoration: underline; }
+  .term { border-bottom: 1px dotted var(--ink-3); cursor: help; }
+  .delta-pos { color: var(--green); font-weight: 600; }
+  .delta-neg { color: var(--red); font-weight: 600; }
+  .delta-neu { color: var(--ink-3); }
+  .scope-note { font-size: 12px; color: var(--ink-3); background: var(--accent-wash);
+    border-radius: var(--r-md); padding: 9px 13px; margin: 4px 0 14px; line-height: 1.5; }
+  .ai-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 860px){ .ai-grid-2 { grid-template-columns: 1fr; } }
+  .tbl-wrap { overflow-x: auto; }
+  .seg-toggle { display: inline-flex; gap: 0; border: 1px solid var(--line); border-radius: var(--r-pill); overflow: hidden; }
+  .seg-toggle button { font-size: 12px; font-weight: 600; padding: 6px 13px; border: none; background: var(--bg-card); color: var(--ink-3); cursor: pointer; }
+  .seg-toggle button.on { background: var(--accent); color: #fff; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Libraries (CDN) -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<!-- Data + app -->
+<script src="data/ai-data.js"></script>
+<script src="utils.js"></script>
+<script src="ai-utils.js"></script>
+<script type="text/babel" data-presets="react" src="components.jsx"></script>
+<script type="text/babel" data-presets="react" src="tabs.jsx"></script>
+<script type="text/babel" data-presets="react" src="app.jsx"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "ozdilekteyim-ai-trafik-analizi",
+  "version": "1.0.0",
+  "description": "Özdilekteyim AI (ChatGPT referral) trafik analizi raporu — interaktif, paylaşılabilir.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "build": "node scripts/build-ai-data.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "xlsx": "^0.18.5"
+  }
+}
