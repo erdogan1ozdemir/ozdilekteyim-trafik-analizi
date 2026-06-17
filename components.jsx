@@ -4,7 +4,12 @@
   const { useState, useRef, useEffect, useMemo } = React;
   const U = window.U, AU = window.AU;
 
-  // ——— Terim sözlüğü (tooltip) ———
+  // datalabels eklentisini global kaydet, varsayılan KAPALI
+  if (window.Chart && window.ChartDataLabels) {
+    window.Chart.register(window.ChartDataLabels);
+    window.Chart.defaults.set('plugins.datalabels', { display:false });
+  }
+
   const GLOSSARY = {
     'session':'Bir kullanıcının siteyle tek ziyaret oturumu (GA4 metriği).',
     'CR':'Conversion Rate — oturum başına tamamlanan transaction oranı.',
@@ -13,15 +18,11 @@
     'referral':'Başka bir kaynaktan (burada chatgpt.com) gelen yönlendirme trafiği.',
     'Landing Page':'Kullanıcının siteye giriş yaptığı ilk sayfa.',
     'transaction':'Tamamlanan satın alma işlemi.',
-    'AI Overview':'Arama sonuçlarında yapay zeka tarafından üretilen özet bloğu.',
   };
-  function Term({t, children}) {
-    return h('span', { className:'term', 'data-term':t, title: GLOSSARY[t] || '' }, children || t);
-  }
+  function Term({t, children}) { return h('span',{className:'term','data-term':t,title:GLOSSARY[t]||''}, children||t); }
 
-  // ——— Section header (ToC hedefi) ———
   function Section({id, title, desc, children, tools, innerRef}) {
-    return h('section', { id, ref: innerRef, className:'ai-section card' },
+    return h('section', { id, ref:innerRef, className:'ai-section card' },
       h('div', { className:'card-header' },
         h('div', null,
           h('div', { className:'card-title-row' }, h('strong', null, title)),
@@ -33,167 +34,171 @@
     );
   }
 
-  // ——— PNG export butonu (bir node ref'ini görüntüye çevirir) ———
   function PngButton({targetRef, name}) {
     const [busy, setBusy] = useState(false);
-    return h('button', {
-      className:'png-btn',
-      disabled: busy,
-      onClick: async () => {
-        if (!targetRef.current) return;
-        setBusy(true);
-        try { await AU.downloadPNG(targetRef.current, name); } finally { setBusy(false); }
-      }
+    return h('button', { className:'png-btn', disabled:busy,
+      onClick: async () => { if (!targetRef.current) return; setBusy(true); try { await AU.downloadPNG(targetRef.current, name); } finally { setBusy(false); } }
     }, busy ? '…' : '⤓ PNG');
   }
   function CsvButton({rows, headers, name}) {
-    return h('button', {
-      className:'png-btn',
-      onClick: () => U.downloadCSV((name||'veri')+'.csv', U.toCSV(rows, headers))
-    }, '⤓ CSV');
+    return h('button', { className:'png-btn', onClick: () => U.downloadCSV((name||'veri')+'.csv', U.toCSV(rows, headers)) }, '⤓ CSV');
   }
-
-  // ——— llms.txt rozeti ———
   function LlmsBadge() {
     return h('span', { className:'ai-llms-badge', title:'Bu sayfa llms.txt "Önemli Sayfalar" listesinde yer alıyor (Şubat 2026 eklendi).' }, '✦ llms');
   }
 
-  // ——— KPI scorecard şeridi ———
-  function KpiStrip({items}) {
-    return h('div', { className:'kpi-strip', style:{display:'grid', gridTemplateColumns:`repeat(${items.length}, 1fr)`, gap:'12px', marginBottom:'18px'} },
-      items.map((it,i) => h('div', { key:i, className:'kpi kpi-mini', style:{position:'relative', background:'var(--bg-card)', border:'1px solid var(--line)', borderRadius:'var(--r-lg)', padding:'14px 16px', boxShadow:'var(--shadow-card)'} },
-        h('div', { className:'bar', style:{background: it.color || 'var(--accent)'} }),
-        h('div', { className:'label' }, it.label),
-        h('div', { className:'value' }, it.value),
-        it.sub ? h('div', { style:{fontSize:'11px', color:'var(--ink-3)', marginTop:'3px'} }, it.sub) : null
-      ))
+  // ——— Yeni KPI kartları: gradient/gölge + opsiyonel sparkline (sol bar YOK) ———
+  function KpiStrip({items, cols}) {
+    return h('div', { className:'kpi2-grid', style:{gridTemplateColumns:`repeat(${cols||items.length}, 1fr)`} },
+      items.map((it,i) => {
+        const c = it.color || 'var(--accent)';
+        let sp = null;
+        if (it.spark && it.spark.length>1) {
+          const {line, area} = U.sparkPath(it.spark, 120, 30, 2);
+          sp = h('svg', { className:'k-spark', width:'100%', height:30, viewBox:'0 0 120 30', preserveAspectRatio:'none' },
+            h('path',{d:area, fill:c, fillOpacity:.13}), h('path',{d:line, stroke:c, strokeWidth:1.6, fill:'none', strokeLinecap:'round', strokeLinejoin:'round'}));
+        }
+        return h('div', { key:i, className:'kpi2' },
+          h('div', { className:'k-glow', style:{background:`linear-gradient(135deg, color-mix(in srgb, ${c} 13%, var(--bg-card)) 0%, var(--bg-card) 62%)`} }),
+          h('div', { className:'k-label' }, it.label),
+          h('div', { className:'k-value', style:{color:c} }, it.value),
+          it.sub ? h('div', { className:'k-sub' }, it.sub) : null,
+          sp
+        );
+      })
     );
   }
 
-  // ——— Chart.js canvas wrapper ———
+  function chartTheme() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return { grid: dark?'rgba(255,255,255,.06)':'rgba(16,51,47,.07)', tick: dark?'#B8B0A3':'#8A8A8A', ink: dark?'#F5F1EA':'#10332F' };
+  }
+
   function ChartCanvas({buildConfig, deps, height}) {
-    const ref = useRef(null);
-    const chartRef = useRef(null);
+    const ref = useRef(null), chartRef = useRef(null);
     useEffect(() => {
       if (!ref.current || !window.Chart) return;
-      const cfg = buildConfig();
-      chartRef.current = new window.Chart(ref.current.getContext('2d'), cfg);
+      chartRef.current = new window.Chart(ref.current.getContext('2d'), buildConfig());
       return () => { if (chartRef.current) chartRef.current.destroy(); };
     }, deps || []);
     return h('div', { className:'ai-chart-wrap', style:{height:(height||320)+'px'} }, h('canvas', { ref }));
   }
 
-  // Tema farkında grid/tick renkleri
-  function chartTheme() {
-    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-    return {
-      grid: dark ? 'rgba(255,255,255,.06)' : 'rgba(16,51,47,.07)',
-      tick: dark ? '#B8B0A3' : '#8A8A8A',
-      ink:  dark ? '#F5F1EA' : '#10332F',
-    };
-  }
-
-  // ——— Çoklu metrik toggle çizgi grafiği (manşet) ———
-  function MetricToggleChart({rows, defaultMetrics}) {
+  // ——— Çoklu metrik çizgi grafiği: metrik toggle + değer etiketi toggle ———
+  function MetricChart({rows, defaultMetrics, height, label}) {
     const [enabled, setEnabled] = useState(defaultMetrics || ['sessions','revenue']);
-    const months = AU.MONTHS;
-    const labels = months.map(AU.trMonth);
+    const [showLabels, setShowLabels] = useState(false);
+    const labels = AU.MONTHS.map(AU.trMonth);
     const order = ['sessions','revenue','tx','aov','cr'];
-
-    function toggle(m){
-      setEnabled(prev => prev.includes(m) ? prev.filter(x=>x!==m) : [...prev, m]);
-    }
-
+    function toggle(m){ setEnabled(prev => prev.includes(m) ? (prev.length>1?prev.filter(x=>x!==m):prev) : [...prev, m]); }
     const build = () => {
       const th = chartTheme();
-      const enOrdered = order.filter(m => enabled.includes(m));
+      const en = order.filter(m => enabled.includes(m));
       const scales = { x: { grid:{color:th.grid}, ticks:{color:th.tick, font:{size:11}} } };
-      const datasets = enOrdered.map((m, idx) => {
-        const M = AU.METRICS[m];
-        const axisId = 'y_'+m;
-        const showAxis = idx < 2; // ilk 2 metriğin ekseni görünür (sol/sağ)
-        scales[axisId] = {
-          position: idx % 2 === 0 ? 'left' : 'right',
-          display: showAxis,
-          grid: { drawOnChartArea: idx === 0, color: th.grid },
-          ticks: { color: M.color, font:{size:10}, callback:(v)=> (m==='revenue'||m==='aov') ? AU.fmtTRY(v,{compact:true}) : (m==='cr'? (v*100).toFixed(1)+'%' : U.fmtNum(v)) },
-        };
-        return {
-          label: M.label, yAxisID: axisId,
-          data: AU.monthlySeries(rows, m),
-          borderColor: M.color, backgroundColor: M.color+'22',
-          borderWidth: 2.5, tension: .32, pointRadius: 3, pointHoverRadius: 5, fill: false,
-        };
+      const datasets = en.map((m, idx) => {
+        const M = AU.METRICS[m]; const axisId = 'y_'+m; const showAxis = idx < 2;
+        scales[axisId] = { position: idx%2===0?'left':'right', display:showAxis, grid:{drawOnChartArea:idx===0, color:th.grid},
+          ticks:{ color:M.color, font:{size:10}, callback:v=> (m==='revenue'||m==='aov')?AU.fmtTRY(v,{compact:true}):(m==='cr'?(v*100).toFixed(1)+'%':U.fmtNum(v)) } };
+        return { label:M.label, yAxisID:axisId, data:AU.monthlySeries(rows, m), borderColor:M.color, backgroundColor:M.color+'22',
+          borderWidth:2.5, tension:.32, pointRadius:3, pointHoverRadius:5, fill:false,
+          datalabels:{ display:showLabels, color:M.color, anchor:'end', align:'top', font:{family:'Bricolage Grotesque', weight:700, size:10},
+            formatter:v=> (m==='revenue'||m==='aov')?AU.fmtTRY(v,{compact:true}):(m==='cr'?(v*100).toFixed(1)+'%':U.fmtNum(v)) } };
       });
-      return {
-        type:'line',
-        data: { labels, datasets },
-        options: {
-          responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
-          plugins: {
-            legend: { display:false },
-            tooltip: { callbacks: { label:(c)=>{ const key=order.find(k=>AU.METRICS[k].label===c.dataset.label); return c.dataset.label+': '+AU.METRICS[key].fmt(c.parsed.y); } } },
-          },
-          scales,
-        },
-      };
+      return { type:'line', data:{labels, datasets},
+        options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+          plugins:{ legend:{display:false}, datalabels:{display:showLabels},
+            tooltip:{ callbacks:{ label:c=>{ const k=order.find(x=>AU.METRICS[x].label===c.dataset.label); return c.dataset.label+': '+AU.METRICS[k].fmt(c.parsed.y); } } } },
+          scales } };
     };
-
     return h('div', null,
-      h('div', { className:'ai-metric-legend' },
-        order.map(m => {
-          const M = AU.METRICS[m]; const on = enabled.includes(m);
-          return h('span', { key:m, className:'ml'+(on?' on':''), style: on?{color:M.color}:{}, onClick:()=>toggle(m) },
-            h('span', { className:'dot', style:{background:M.color} }), M.short);
-        })
+      h('div', { style:{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'8px'} },
+        h('div', { className:'ai-metric-legend' },
+          order.map(m => { const M=AU.METRICS[m]; const on=enabled.includes(m);
+            return h('span', { key:m, className:'ml'+(on?' on':''), style:on?{color:M.color}:{}, onClick:()=>toggle(m) },
+              h('span',{className:'dot',style:{background:M.color}}), M.short); })
+        ),
+        h('button', { className:'lbl-toggle'+(showLabels?' on':''), onClick:()=>setShowLabels(s=>!s), title:'Grafik üzerinde değerleri göster/gizle' },
+          (showLabels?'✓ ':'')+'Değerler')
       ),
-      h(ChartCanvas, { buildConfig: build, deps:[enabled.join(','), rows], height:360 })
+      h(ChartCanvas, { buildConfig:build, deps:[enabled.join(','), showLabels, rows], height:height||360 })
     );
   }
 
-  // ——— Genel sortable tablo ———
-  // columns: [{key,label,align,get,render,sortable}]  rows: data array
-  function DataTable({columns, rows, initialSort, maxRows}) {
+  // ——— Donut (Chart.js) ———
+  function Donut({groups, metric, colors, height}) {
+    const total = groups.reduce((s,g)=>s+g[metric],0) || 1;
+    const build = () => ({ type:'doughnut',
+      data:{ labels:groups.map(g=>g.key), datasets:[{ data:groups.map(g=>g[metric]), backgroundColor:groups.map(g=>colors[g.key]||'#999'), borderWidth:2, borderColor:'var(--bg-card)' }] },
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'58%',
+        plugins:{ legend:{position:'right', labels:{color:chartTheme().ink, font:{size:11}, boxWidth:12}},
+          datalabels:{display:false},
+          tooltip:{callbacks:{label:c=>c.label+': '+AU.METRICS[metric].fmt(c.parsed)+' ('+(c.parsed/total*100).toFixed(1)+'%)'}} } } });
+    return h(ChartCanvas, { buildConfig:build, deps:[metric, groups], height:height||300 });
+  }
+
+  // ——— sortable + tıklanabilir tablo ———
+  function DataTable({columns, rows, initialSort, maxRows, onRowClick, activeKey, keyOf}) {
     const [sort, setSort] = useState(initialSort || { key: columns[0].key, dir:'desc' });
     const sorted = useMemo(() => {
       const col = columns.find(c=>c.key===sort.key);
       const getv = (r)=> col && col.get ? col.get(r) : r[sort.key];
-      const arr = [...rows].sort((a,b)=>{
-        const va=getv(a), vb=getv(b);
-        if (typeof va==='number' && typeof vb==='number') return sort.dir==='asc'? va-vb : vb-va;
-        return sort.dir==='asc'? String(va).localeCompare(String(vb),'tr') : String(vb).localeCompare(String(va),'tr');
-      });
+      const arr = [...rows].sort((a,b)=>{ const va=getv(a), vb=getv(b);
+        if (typeof va==='number' && typeof vb==='number') return sort.dir==='asc'?va-vb:vb-va;
+        return sort.dir==='asc'?String(va).localeCompare(String(vb),'tr'):String(vb).localeCompare(String(va),'tr'); });
       return maxRows ? arr.slice(0, maxRows) : arr;
-    }, [rows, sort]);
-    function hdrClick(c){ if (c.sortable===false) return; setSort(s => ({key:c.key, dir: s.key===c.key && s.dir==='desc' ? 'asc':'desc'})); }
+    }, [rows, sort, maxRows]);
+    function hdrClick(c){ if (c.sortable===false) return; setSort(s => ({key:c.key, dir: s.key===c.key && s.dir==='desc'?'asc':'desc'})); }
     return h('div', { className:'tbl-wrap' },
       h('table', { className:'tbl' },
         h('thead', null, h('tr', null, columns.map(c =>
           h('th', { key:c.key, onClick:()=>hdrClick(c), style:{cursor:c.sortable===false?'default':'pointer', textAlign:c.align||'left', whiteSpace:'nowrap'} },
-            c.label, sort.key===c.key ? h('span',{style:{marginLeft:'4px',color:'var(--accent)'}}, sort.dir==='asc'?'▲':'▼') : null)
-        ))),
-        h('tbody', null, sorted.map((r,i) =>
-          h('tr', { key:i }, columns.map(c =>
-            h('td', { key:c.key, className: c.align==='right'?'num':'', style:{textAlign:c.align||'left'} },
-              c.render ? c.render(r) : (c.get ? c.get(r) : r[c.key]))
-          ))
-        ))
+            c.label, sort.key===c.key ? h('span',{style:{marginLeft:'4px',color:'var(--accent)'}}, sort.dir==='asc'?'▲':'▼') : null))
+        )),
+        h('tbody', null, sorted.map((r,i) => {
+          const k = keyOf ? keyOf(r) : i;
+          const active = activeKey!=null && k===activeKey;
+          return h('tr', { key:i, className:(onRowClick?'row-clickable ':'')+(active?'row-active':''), onClick: onRowClick?()=>onRowClick(r):undefined },
+            columns.map(c => h('td', { key:c.key, className:c.align==='right'?'num':'', style:{textAlign:c.align||'left'} },
+              c.render ? c.render(r) : (c.get ? c.get(r) : r[c.key]))));
+        }))
       )
     );
   }
 
-  // ——— Segment toggle (metrik seçici) ———
   function SegToggle({options, value, onChange}) {
-    return h('div', { className:'seg-toggle' },
-      options.map(o => h('button', { key:o.key, className: value===o.key?'on':'', onClick:()=>onChange(o.key) }, o.label))
+    return h('div', { className:'seg-toggle' }, options.map(o => h('button', { key:o.key, className:value===o.key?'on':'', onClick:()=>onChange(o.key) }, o.label)));
+  }
+
+  // ——— MultiSelect (checkbox dropdown) ———
+  function MultiSelect({label, options, selected, onChange, width, colorMap}) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef(null);
+    useEffect(() => { const onDoc=e=>{ if(ref.current && !ref.current.contains(e.target)) setOpen(false); }; document.addEventListener('mousedown',onDoc); return ()=>document.removeEventListener('mousedown',onDoc); }, []);
+    const toggle = (o)=> selected.includes(o)?onChange(selected.filter(x=>x!==o)):onChange([...selected,o]);
+    const txt = selected.length===0?`Tüm ${label}`: selected.length===1?selected[0]: `${selected.length} ${label} seçili`;
+    return h('div', { ref, className:'multiselect', style:{width:width||190} },
+      h('button', { className:'multiselect-trigger'+(open?' open':''), onClick:()=>setOpen(!open) }, h('span',{className:'ms-text'},txt), h('span',{className:'ms-caret'},'▾')),
+      open && h('div', { className:'multiselect-panel' },
+        h('div', { className:'ms-actions' }, h('button',{className:'ms-action',onClick:()=>onChange([])},'Temizle')),
+        h('div', { className:'ms-options' }, options.map(o => h('label',{key:o, className:'ms-option'},
+          h('input',{type:'checkbox', checked:selected.includes(o), onChange:()=>toggle(o)}),
+          colorMap && h('span',{className:'ms-swatch', style:{background:colorMap[o]||'#888'}}),
+          h('span',{className:'ms-label'},o))))
+      )
     );
   }
 
-  // ——— Ay multiselect (chip-btn satırı şeklinde, basit ve sağlam) ———
+  function SearchInput({value, onChange, placeholder}) {
+    return h('div', { className:'search-box' },
+      h('span', { className:'si' }, h('svg',{width:14,height:14,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round'},h('circle',{cx:11,cy:11,r:7}),h('line',{x1:21,y1:21,x2:16.65,y2:16.65}))),
+      h('input', { type:'text', value, placeholder:placeholder||'Ara…', onChange:e=>onChange(e.target.value) }),
+      value ? h('button', { className:'clr', onClick:()=>onChange(''), title:'Temizle' }, '×') : null
+    );
+  }
+
   function MonthFilter({months, selected, onChange}) {
-    const allOn = selected.size === 0 || selected.size === months.length;
+    const allOn = selected.size === 0;
     function toggle(m){
-      // "Tüm aylar" durumundayken tek aya tıklamak o aya izole eder (sezgisel davranış)
       if (selected.size===0){ onChange(new Set([m])); return; }
       const next = new Set(selected);
       if (next.has(m)) next.delete(m); else next.add(m);
@@ -201,17 +206,20 @@
       onChange(next);
     }
     return h('div', { className:'chips', style:{display:'flex', flexWrap:'wrap', gap:'6px', alignItems:'center'} },
-      h('button', { className:'chip-btn'+(allOn?' active':''), style: allOn?{background:'var(--accent)', color:'#fff', borderColor:'var(--accent)'}:{}, onClick:()=>onChange(new Set()) }, 'Tüm aylar'),
-      months.map(m => {
-        const on = selected.size>0 && selected.has(m);
-        const partial = (AU.META.partialMonths||[]).includes(m);
-        return h('button', { key:m, className:'chip-btn'+(on?' active':''),
-          style: on?{background:'var(--accent)', color:'#fff', borderColor:'var(--accent)'}:{},
-          title: partial?'Kısmi ay (rapor üretim tarihine kadar olan veriler)':'',
-          onClick:()=>toggle(m) }, AU.trMonth(m), partial? ' *' : '');
-      })
+      h('button', { className:'chip-btn'+(allOn?' active':''), style: allOn?{background:'var(--accent)',color:'#fff',borderColor:'var(--accent)'}:{}, onClick:()=>onChange(new Set()) }, 'Tüm aylar'),
+      months.map(m => { const on = selected.size>0 && selected.has(m); const partial=(AU.META.partialMonths||[]).includes(m);
+        return h('button', { key:m, className:'chip-btn'+(on?' active':''), style:on?{background:'var(--accent)',color:'#fff',borderColor:'var(--accent)'}:{},
+          title: partial?'Kısmi ay':'', onClick:()=>toggle(m) }, AU.trMonth(m)+(partial?' *':'')); })
     );
   }
 
-  window.COMP = { Term, Section, PngButton, CsvButton, LlmsBadge, KpiStrip, ChartCanvas, chartTheme, MetricToggleChart, DataTable, SegToggle, MonthFilter };
+  // ——— Özet mini-özet kartı (tıklayınca ilgili sekmeye gider) ———
+  function SummaryCard({title, goLabel, onGo, rows}) {
+    return h('div', { className:'summary-card', onClick:onGo },
+      h('div', { className:'sc-head' }, h('span',{className:'sc-title'},title), h('span',{className:'sc-go'}, (goLabel||'Detay')+' →')),
+      rows.map((r,i)=>h('div',{key:i, className:'sc-row'}, h('span',{className:'nm'}, r.nm), h('span',{className:'vv'}, r.vv)))
+    );
+  }
+
+  window.COMP = { Term, Section, PngButton, CsvButton, LlmsBadge, KpiStrip, ChartCanvas, chartTheme, MetricChart, Donut, DataTable, SegToggle, MultiSelect, SearchInput, MonthFilter, SummaryCard };
 })();

@@ -94,9 +94,63 @@ window.AU = (function(){
     cr:          { label:'Dönüşüm (CR)',     short:'CR',        color:'#F5A623', fmt:v=>window.U.fmtPct(v,2) },
   };
 
+  // ——— distinct boyut listeleri (oturuma göre sıralı) ———
+  function distinctBy(keyFn) {
+    const m = new Map();
+    for (const r of ROWS) { const k = keyFn(r); if (k==null) continue; m.set(k,(m.get(k)||0)+r.sessions); }
+    return [...m.entries()].sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+  }
+  const ALL_PTYPES = distinctBy(r=>r.ptype);
+  const ALL_BRANDS = distinctBy(r=>r.brand);
+
+  // ——— çok boyutlu filtre: {monthSet, search, ptypes[], brands[]} ———
+  function applyFilters(rows, f) {
+    f = f || {};
+    let out = rows;
+    if (f.monthSet && f.monthSet.size) out = out.filter(r=>f.monthSet.has(r.ym));
+    if (f.ptypes && f.ptypes.length) { const s=new Set(f.ptypes); out = out.filter(r=>s.has(r.ptype)); }
+    if (f.brands && f.brands.length) { const s=new Set(f.brands); out = out.filter(r=>r.brand && s.has(r.brand)); }
+    if (f.search && f.search.trim()) { const q=f.search.trim().toLowerCase(); out = out.filter(r=>r.lp.toLowerCase().includes(q) || (r.brand&&r.brand.toLowerCase().includes(q))); }
+    return out;
+  }
+
+  // ——— tek bir LP'nin aylık serisi ———
+  function lpSeries(lp, metric) {
+    const rows = ROWS.filter(r=>r.lp===lp);
+    return monthlySeries(rows, metric);
+  }
+
+  // ——— sparkline path (U.sparkPath sarmalayıcı) ———
+  function spark(values, w, h) { return window.U.sparkPath(values, w, h, 2); }
+
+  // ——— llms.txt: kategori/marka sayfasından ürün keşfi eşleştirmesi ———
+  const STOP = new Set(['kadin','erkek','cocuk','unisex','modelleri','fiyatlari','fiyatları','ve','com','takimi','takim',
+    'urunleri','urun','cesitleri','cesit','set','seti','2','3','4','cp2','cp','online','satin','al']);
+  function llmsTokens(lp) {
+    // marka sayfası → marka adı; kategori sayfası → anlamlı token'lar
+    const m = lp.toLowerCase().match(/\/magaza\/marka\/([a-z0-9_-]+)/);
+    if (m) return { type:'Marka', key:m[1].replace(/[_-]+/g,' '), tokens:[m[1].replace(/[_-]+/g,'')] };
+    const seg = lp.toLowerCase().replace(/\/+$/,'').split('/').filter(Boolean);
+    const slug = seg[1] || '';
+    const toks = slug.replace(/\d+$/,'').split('-').map(t=>t.replace(/[^a-zçğıöşü]/g,'')).filter(t=>t.length>2 && !STOP.has(t));
+    return { type:'Kategori', key:slug, tokens:toks };
+  }
+  // bir llms sayfası için ilişkili ürün satırları (slug token eşleşmesi veya marka eşleşmesi)
+  function relatedProductRows(allRows, llmsLp, brandOf) {
+    const info = llmsTokens(llmsLp);
+    if (!info.tokens.length && !brandOf) return [];
+    return allRows.filter(r => {
+      if (r.ptype !== 'Ürün') return false;
+      const lpl = r.lp.toLowerCase();
+      if (info.type==='Marka' && brandOf && r.brand && r.brand.toLowerCase().replace(/\s+/g,'')===brandOf.toLowerCase().replace(/\s+/g,'')) return true;
+      return info.tokens.some(t => lpl.includes(t));
+    });
+  }
+
   return {
     META, ROWS, MONTHS, MONTH_TR, trMonth,
     fmtTRY, inMonths, totals, groupBy, monthlySeries,
     lpLabel, lpUrl, downloadPNG, deltaPct, deltaClass, METRICS,
+    ALL_PTYPES, ALL_BRANDS, applyFilters, lpSeries, spark, llmsTokens, relatedProductRows,
   };
 })();
