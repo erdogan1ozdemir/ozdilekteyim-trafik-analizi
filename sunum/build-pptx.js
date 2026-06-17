@@ -90,7 +90,7 @@ s=p.addSlide(); s.background={color:WHITE}; breadcrumb(s,'Trafik Nereye Gidiyor'
 title(s,[{text:'En değerli '},hl('sayfalar')]);
 const cols3=[['EN ÇOK OTURUM','Trafik',[['philips su arıtma','317'],['/magaza','235'],['sjcam kamera','195'],['anasayfa','173'],['özdilek point seti','98']]],
   ['EN ÇOK CİRO · ÜRÜN','Ciro',[['fissler vitavit prem.','₺20,0K'],['fissler vitaquick','₺16,0K'],['fissler vitavit mat','₺14,0K'],['özdilek pike takımı','₺11,9K'],['stanley termos','₺5,1K']]],
-  ['EN ÇOK İŞLEM · ÜRÜN','Transaction',[['stanley termos','3'],['sjcam kamera','2'],['fissler serisi','1+'],['özdilek pike','1'],['market ürünleri','1+']]]];
+  ['EN ÇOK İŞLEM · ÜRÜN','Transaction',[['stanley termos','3'],['sjcam kamera','2'],['lumberjack ayakkabı','2'],['tefal tost makinesi','2'],['özdilek yorgan','2']]]];
 cols3.forEach((c,i)=>{ const x=0.5+i*4.2,y=1.7; s.addShape(p.ShapeType.roundRect,{x,y,w:3.9,h:4.2,fill:{color:'FBFAF8'},line:{color:LINE,pt:1},rectRadius:0.1});
   s.addText(c[0],{x:x+0.25,y:y+0.25,w:3.4,h:0.3,fontFace:HF,fontSize:10,bold:true,color:CORAL,charSpacing:1});
   s.addText(c[1],{x:x+0.25,y:y+0.55,w:3.4,h:0.4,fontFace:HF,fontSize:18,bold:true,color:TEAL});
@@ -102,11 +102,11 @@ logoTeal(s); sourcePill(s,'Kaynak: GA4 · AI referral');
 // 09 MARKA (bar + liste)
 s=p.addSlide(); s.background={color:WHITE}; breadcrumb(s,'Trafik Nereye Gidiyor','Marka merceği');
 title(s,[{text:'Marka '},hl('merceği')]);
-s.addChart(p.ChartType.bar,[{name:'Oturum',labels:['Özdilek','Mavi','Adidas','Skechers','Philips','Pierre Cardin','Calvin Klein','Guess'],values:[1823,1299,1232,867,847,610,588,542]}],
+s.addChart(p.ChartType.bar,[{name:'Oturum',labels:['Özdilek','Mavi','Adidas','Skechers','Philips','Pierre Cardin','Calvin Klein','Guess','Koton','Merrell'],values:[1823,1299,1232,867,847,610,588,542,472,454]}],
   {x:0.5,y:1.7,w:7.2,h:4.8,barDir:'bar',chartColors:[CORAL],showValue:true,dataLabelColor:INK,dataLabelFontFace:BF,dataLabelFontSize:10,catAxisLabelColor:INK,catAxisLabelFontFace:BF,valAxisHidden:true,showLegend:false,valGridLine:{style:'none'}});
 const brTbl=[[{text:'Marka',options:{bold:true}},{text:'Oturum',options:{bold:true,align:'right'}},{text:'Ciro',options:{bold:true,align:'right'}},{text:'Tx',options:{bold:true,align:'right'}}]];
-[['Özdilek','1.823','₺41,7K','12'],['Mavi','1.299','₺13,9K','11'],['Adidas','1.232','₺34,5K','13'],['Skechers','867','₺39,8K','9'],['Philips','847','₺12,7K','2'],['Pierre Cardin','610','₺22,5K','6']].forEach(r=>brTbl.push([r[0],{text:r[1],options:{align:'right'}},{text:r[2],options:{align:'right'}},{text:r[3],options:{align:'right'}}]));
-s.addTable(brTbl,{x:8.0,y:1.9,w:4.8,colW:[1.7,1.1,1.2,0.8],fontFace:BF,fontSize:11,color:INK,rowH:0.42,border:{type:'solid',color:LINE,pt:0.5},valign:'middle'});
+[['Özdilek','1.823','₺41,7K','12'],['Mavi','1.299','₺13,9K','11'],['Adidas','1.232','₺34,5K','13'],['Skechers','867','₺39,8K','9'],['Philips','847','₺12,7K','2'],['Pierre Cardin','610','₺22,5K','6'],['Calvin Klein','588','₺19,7K','4'],['Guess','542','₺6,8K','2'],['Koton','472','₺4,8K','4'],['Merrell','454','₺22,6K','4']].forEach(r=>brTbl.push([r[0],{text:r[1],options:{align:'right'}},{text:r[2],options:{align:'right'}},{text:r[3],options:{align:'right'}}]));
+s.addTable(brTbl,{x:8.0,y:1.7,w:4.8,colW:[1.7,1.1,1.2,0.8],fontFace:BF,fontSize:10.5,color:INK,rowH:0.36,border:{type:'solid',color:LINE,pt:0.5},valign:'middle'});
 logoTeal(s); sourcePill(s,'Kaynak: GA4 · AI referral');
 
 // 10 YÜKSELENLER
@@ -114,7 +114,7 @@ s=p.addSlide(); s.background={color:WHITE}; breadcrumb(s,'Trafik Nereye Gidiyor'
 title(s,[{text:'Zaman içinde '},hl('yükselenler')]);
 s.addText('Dönemin ilk yarısı (Kas–Şub) ile ikinci yarısı (Mar–Haz) arasındaki AI oturum artışı (Δ).',{x:0.5,y:1.55,w:12,h:0.4,fontFace:BF,fontSize:13,color:INK2});
 s.addText('Yükselen markalar · Δ oturum',{x:0.5,y:2.1,w:6,h:0.35,fontFace:HF,fontSize:14,bold:true,color:CORALD});
-s.addChart(p.ChartType.bar,[{name:'Δ Oturum',labels:['Özdilek','Adidas','Skechers','SJCAM','Philips','New Balance'],values:[391,300,277,247,247,190]}],
+s.addChart(p.ChartType.bar,[{name:'Δ Oturum',labels:['Özdilek','Adidas','Skechers','SJCAM','Philips','New Balance','Puma','Mavi','Urban Care','Under Armour'],values:[391,300,277,247,247,190,140,123,89,69]}],
   {x:0.5,y:2.5,w:6.5,h:3.8,barDir:'bar',chartColors:[CORAL],showValue:true,dataLabelColor:INK,dataLabelFontFace:BF,catAxisLabelColor:INK,catAxisLabelFontFace:BF,valAxisHidden:true,showLegend:false,valGridLine:{style:'none'}});
 s.addText('Yükselen sayfalar / ürünler · Δ oturum',{x:7.4,y:2.1,w:5.4,h:0.35,fontFace:HF,fontSize:14,bold:true,color:CORALD});
 const riseLp=[['philips su arıtma cihazı','+211'],['sjcam aksiyon kamera','+193'],['anasayfa','+153'],['özdilek point happy aile seti','+52'],['acton pocket camera gimbal','+44']].map(r=>[{text:r[0],options:{fontSize:12,color:INK2}},{text:r[1],options:{fontSize:12,bold:true,color:GREEN,align:'right'}}]);
@@ -129,8 +129,8 @@ separator('03','Fırsat & llms.txt');
 s=p.addSlide(); s.background={color:WHITE}; breadcrumb(s,'Fırsat & llms.txt','Dönüşüm fırsatı sayfaları');
 title(s,[{text:'AI oturumu yüksek, '},hl('dönüşüm fırsatı'),{text:' taşıyan sayfalar'}],0.5,0.85,28);
 const fRows=[[{text:'Sayfa',options:{bold:true}},{text:'Tip',options:{bold:true}},{text:'Oturum',options:{bold:true,align:'right'}},{text:'İşlem',options:{bold:true,align:'right'}}]];
-[['philips su arıtma cihazı','Ürün','317','0'],['anasayfa','Anasayfa','173','0'],['özdilek point happy aile seti','Ürün','98','0'],['philips hava temizleme cihazı','Ürün','67','0'],['acton pocket camera gimbal','Ürün','62','0'],['acton selfie aksiyon kamerası','Ürün','54','0']].forEach(r=>fRows.push([r[0],r[1],{text:r[2],options:{align:'right'}},{text:r[3],options:{align:'right',fill:{color:REDW},color:RED,bold:true}}]));
-s.addTable(fRows,{x:0.5,y:1.9,w:7.3,colW:[3.6,1.5,1.1,1.1],fontFace:BF,fontSize:12,color:INK,rowH:0.45,border:{type:'solid',color:LINE,pt:0.5},valign:'middle'});
+[['philips su arıtma cihazı','Ürün','317','0'],['anasayfa','Anasayfa','173','0'],['özdilek point happy aile seti','Ürün','98','0'],['philips hava temizleme cihazı','Ürün','67','0'],['acton pocket camera gimbal','Ürün','62','0'],['acton selfie aksiyon kamerası','Ürün','54','0'],['dyson supersonic saç kurutma','Ürün','47','0'],['tcl movetime çocuk saati','Ürün','42','0'],['getorix oyun yarış direksiyonu','Ürün','41','0'],['acton instant print fotoğraf mak.','Ürün','38','0']].forEach(r=>fRows.push([r[0],r[1],{text:r[2],options:{align:'right'}},{text:r[3],options:{align:'right',fill:{color:REDW},color:RED,bold:true}}]));
+s.addTable(fRows,{x:0.5,y:1.8,w:7.3,colW:[3.6,1.5,1.1,1.1],fontFace:BF,fontSize:11,color:INK,rowH:0.4,border:{type:'solid',color:LINE,pt:0.5},valign:'middle'});
 s.addText([{text:'Philips',options:{bold:true,color:CORALD}},{text:' ürün sayfaları yüksek ilgi görmekte fakat işleme dönüşmemektedir; fiyat, stok ve içerik bütünlüğü değerlendirilebilir.\n\n'},{text:'Acton',options:{bold:true,color:CORALD}},{text:' kamera ürünleri tekrarlı şekilde listede yer almaktadır.\n\nAnasayfa girişlerinin ilgili kategori/ürünlere yönlendirme akışı gözden geçirilebilir.'}],{x:8.1,y:1.9,w:4.7,h:4,fontFace:BF,fontSize:13,color:INK2,valign:'top'});
 logoTeal(s); sourcePill(s,'Kaynak: GA4 · AI referral');
 
