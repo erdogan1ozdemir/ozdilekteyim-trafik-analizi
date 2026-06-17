@@ -195,12 +195,31 @@
     );
   }
 
+  // LP detay modalı: o sayfanın aylık çoklu-metrik akışı + meta
+  function LpModalView({lp, allRows, onClose}){
+    const rows=allRows.filter(r=>r.lp===lp);
+    const t=AU.totals(rows); const meta=rows[0]||{};
+    return h(Modal, { title:AU.lpLabel(lp)+' · sayfa detayı', onClose, width:840 },
+      h('div',{style:{marginBottom:'12px',fontSize:'12px',color:'var(--ink-3)',display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}},
+        h('a',{href:AU.lpUrl(lp),target:'_blank',style:{color:'var(--accent-deep)',textDecoration:'none'}}, AU.lpUrl(lp)),
+        meta.brand?h('span',{className:'pill',style:{fontSize:'11px'}},meta.brand):null,
+        h('span',{className:'pill',style:{fontSize:'11px'}},meta.ptype),
+        meta.inLlms?h(LlmsBadge):null),
+      h(KpiStrip,{cols:4, items:[
+        {label:'Oturum',value:U.fmtFull(t.sessions),color:AU.METRICS.sessions.color},
+        {label:'Ciro',value:AU.fmtTRY(t.revenue),color:AU.METRICS.revenue.color},
+        {label:'Transaction',value:U.fmtFull(t.tx),color:AU.METRICS.tx.color},
+        {label:'CR',value:U.fmtPct(t.cr,2),color:AU.METRICS.cr.color} ]}),
+      h('div',{style:{fontSize:'12.5px',fontWeight:700,color:'var(--ink-2)',margin:'6px 0 4px'}},'Bu sayfanın aylık akışı'),
+      h(MetricChart, { rows, defaultMetrics:['sessions','revenue'], height:280 })
+    );
+  }
+
   // ============ 4. LANDING PAGE ============
   function LandingPages({rows, filters, setFilters, selectedLp, setSelectedLp}) {
     const [metric, setMetric] = useState('sessions');
     const filtered = useMemo(()=>AU.applyFilters(rows, filters), [rows, filters]);
     const data = useMemo(()=>groupLP(filtered), [filtered]);
-    const chartRows = selectedLp ? AU.ROWS.filter(r=>r.lp===selectedLp) : filtered;
     const cols = [
       {key:'lp', label:'Landing Page', get:r=>r.lp, sortable:false, render:lpCell}, brandCol,
       {key:'ptype', label:'Tip', get:r=>r.ptype, render:r=>h('span',{className:'pill',style:{fontSize:'11px'}},r.ptype)},
@@ -211,12 +230,10 @@
     ];
     const csvHeaders=[{label:'Landing Page',get:r=>r.lp},{label:'Marka',get:r=>r.brand||''},{label:'Tip',get:r=>r.ptype},{label:'llms.txt',get:r=>r.inLlms?'Evet':'Hayır'},{label:'Oturum',get:r=>Math.round(r.sessions)},{label:'Ciro',get:r=>Math.round(r.revenue)},{label:'Transaction',get:r=>Math.round(r.tx)}];
     return h('div', null,
-      h(ExportSection, { id:'sec-lp-chart',
-        title: selectedLp ? ('Sayfa akışı · '+AU.lpLabel(selectedLp)) : 'Filtrelenmiş set · aylık akış',
-        desc: selectedLp ? 'Seçili sayfanın tüm aylardaki metrik akışı. Tabloda tekrar tıklayarak set görünümüne dönülür.' : 'Aşağıdaki filtre/aramaya göre dinamik. Tablodan bir satıra tıklayınca o sayfanın akışı gösterilir.',
+      h(ExportSection, { id:'sec-lp-chart', title:'Filtrelenmiş set · aylık akış',
+        desc:'Aşağıdaki filtre/aramaya göre dinamik. Tablodan bir satıra tıklayınca o sayfanın detay grafiği açılır.',
         pngName:'ozdilekteyim-ai-lp-akis' },
-        selectedLp ? h('div',{style:{marginBottom:'8px'}}, h('button',{className:'chip-btn',onClick:()=>setSelectedLp(null)},'← Set görünümüne dön')) : null,
-        h(MetricChart, { rows:chartRows, defaultMetrics:['sessions','revenue'], height:300 })
+        h(MetricChart, { rows:filtered, defaultMetrics:['sessions','revenue'], height:300 })
       ),
       // FILTRELER — chart altında, tablonun hemen üstünde
       h(FilterBar, { filters, setFilters, extra: metricSeg(metric,setMetric) }),
@@ -224,8 +241,9 @@
         desc:'Excel\'deki tüm sayfalar tekilleştirilmiş haldedir (toplamda oturum almış '+data.length+' sayfa). Bir satıra tıklayınca üstteki grafik o sayfanın akışına döner. ✦ llms işareti llms.txt sayfalarını gösterir.',
         pngName:'ozdilekteyim-ai-landing-page', csv:{rows:[...data].sort((a,b)=>b[metric]-a[metric]),headers:csvHeaders,name:'landing-pages'} },
         h(DataTable, { columns:cols, rows:data, initialSort:{key:metric,dir:'desc'},
-          onRowClick:r=>setSelectedLp(selectedLp===r.lp?null:r.lp), activeKey:selectedLp, keyOf:r=>r.lp })
-      )
+          onRowClick:r=>setSelectedLp(r.lp), activeKey:selectedLp, keyOf:r=>r.lp })
+      ),
+      selectedLp ? h(LpModalView, { lp:selectedLp, allRows:AU.ROWS, onClose:()=>setSelectedLp(null) }) : null
     );
   }
 

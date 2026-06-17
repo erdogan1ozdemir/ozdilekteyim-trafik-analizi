@@ -93,7 +93,8 @@
   .kpi2 .k-spark { margin-top:9px; height:30px; }
 
   /* Özet mini-özet kartları */
-  .summary-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(255px,1fr)); gap:16px; }
+  .summary-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(430px,1fr)); gap:18px; }
+  .summary-card .sc-row .nm { max-width:none; }
   .summary-card { background:var(--bg-card); border:1px solid var(--line); border-radius:var(--r-lg); padding:16px 18px;
     box-shadow:var(--shadow-card); cursor:pointer; transition:transform .15s, box-shadow .15s; }
   .summary-card:hover { box-shadow:var(--shadow-card-hover); transform:translateY(-2px); }
@@ -190,12 +191,13 @@
   .card-header .ai-card-tools .png-btn { background:var(--bg-card); }
 
   /* Not kartları */
-  .note-card { display:flex; gap:12px; align-items:flex-start; background:color-mix(in srgb, var(--accent) 6%, var(--bg-card));
-    border:1px solid color-mix(in srgb, var(--accent) 22%, transparent); border-left:4px solid var(--accent); border-radius:var(--r-md); padding:13px 16px; margin-bottom:14px; }
-  .note-card.method { background:color-mix(in srgb, #1565C0 6%, var(--bg-card)); border-color:color-mix(in srgb,#1565C0 22%,transparent); border-left-color:#1565C0; }
+  .note-card { display:flex; gap:12px; align-items:flex-start;
+    background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--bg-card)) 0%, var(--bg-card) 70%);
+    border:1px solid color-mix(in srgb, var(--accent) 26%, var(--line)); border-radius:var(--r-lg); padding:14px 18px; margin-bottom:14px; box-shadow:var(--shadow-card); }
+  .note-card.method { background:linear-gradient(135deg, color-mix(in srgb, #1565C0 12%, var(--bg-card)) 0%, var(--bg-card) 70%); border-color:color-mix(in srgb,#1565C0 26%,var(--line)); }
   .note-card .note-label { font-family:'Bricolage Grotesque'; font-weight:700; font-size:10px; letter-spacing:.08em; text-transform:uppercase;
-    color:var(--accent-deep); background:var(--bg-card); border-radius:var(--r-pill); padding:4px 10px; white-space:nowrap; flex:none; margin-top:1px; }
-  .note-card.method .note-label { color:#1565C0; }
+    color:#fff; background:var(--accent); border-radius:var(--r-pill); padding:4px 11px; white-space:nowrap; flex:none; margin-top:1px; box-shadow:0 1px 4px color-mix(in srgb,var(--accent) 40%,transparent); }
+  .note-card.method .note-label { background:#1565C0; box-shadow:0 1px 4px rgba(21,101,192,.4); }
   .note-card .note-body { font-size:12.5px; line-height:1.55; color:var(--ink-2); }
   .note-card .note-body strong { color:var(--ink); }
 
@@ -227,7 +229,6 @@
   .theme-toggle { backdrop-filter:none !important; }
   /* D — ekran dışı bölümleri tembel render et (chart içermeyen bölümlerde) */
   .ai-section:not(:has(canvas)) { content-visibility:auto; contain-intrinsic-size:auto 600px; }
-  .summary-card { content-visibility:auto; contain-intrinsic-size:auto 220px; }
   /* "daha fazla" satır kontrolü */
   .tbl-more { text-align:center; margin-top:12px; }
 
