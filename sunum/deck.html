@@ -35,8 +35,8 @@
   .col-card h4 .tag { font-size:10px; font-weight:600; color:var(--coral); display:block; letter-spacing:.06em; text-transform:uppercase; margin-bottom:2px; }
   .bbar-row { display:flex; align-items:center; gap:12px; margin-bottom:11px; }
   .bbar-row .nm { width:120px; font-size:13px; color:var(--teal); font-weight:600; }
-  .bbar-row .track { flex:1; height:18px; background:var(--line-soft); border-radius:999px; overflow:hidden; }
-  .bbar-row .fill { height:100%; background:var(--coral); border-radius:999px; }
+  .bbar-row .track { flex:1; height:18px; background:var(--line-soft); border-radius:999px; overflow:hidden; display:block; }
+  .bbar-row .fill { display:block; height:100%; background:var(--coral); border-radius:999px; }
   .bbar-row .vv { width:78px; text-align:right; font-family:var(--font-display); font-weight:700; font-size:13px; color:var(--teal); font-variant-numeric:tabular-nums; }
   .llms-badge { display:inline-block; font-size:10px; font-weight:700; color:var(--coral-deep); border:1px solid var(--coral); border-radius:999px; padding:1px 6px; margin-left:6px; }
   b.pos { color:var(--green); font-family:var(--font-display); }
@@ -262,6 +262,44 @@
     </div>
   </section>
 
+  <!-- 09b Zaman içinde yükselenler -->
+  <section data-screen-label="Yükselenler">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Trafik Nereye Gidiyor</span><span class="sep">|</span><span class="title">Zaman içinde yükselenler</span></div>
+      <div style="padding:84px 60px 50px;">
+        <h1 style="font-size:34px;">Zaman içinde <span class="hl">yükselenler</span></h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;">Dönemin ilk yarısı (Kas–Şub) ile ikinci yarısı (Mar–Haz) arasındaki AI oturum artışı.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-top:24px;">
+          <div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--coral-deep);margin-bottom:14px;">Yükselen markalar · Δ oturum</div>
+            <div class="bbar-row"><span class="nm">Özdilek</span><span class="track"><span class="fill" style="width:100%;"></span></span><span class="vv">+391</span></div>
+            <div class="bbar-row"><span class="nm">Adidas</span><span class="track"><span class="fill" style="width:77%;"></span></span><span class="vv">+300</span></div>
+            <div class="bbar-row"><span class="nm">Skechers</span><span class="track"><span class="fill" style="width:71%;"></span></span><span class="vv">+277</span></div>
+            <div class="bbar-row"><span class="nm">SJCAM</span><span class="track"><span class="fill" style="width:63%;"></span></span><span class="vv">+247</span></div>
+            <div class="bbar-row"><span class="nm">Philips</span><span class="track"><span class="fill" style="width:63%;"></span></span><span class="vv">+247</span></div>
+            <div class="bbar-row"><span class="nm">New Balance</span><span class="track"><span class="fill" style="width:49%;"></span></span><span class="vv">+190</span></div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--coral-deep);margin-bottom:14px;">Yükselen sayfalar / ürünler · Δ oturum</div>
+            <ul class="minilist">
+              <li><span class="nm">philips su arıtma cihazı</span><span class="vv">+211</span></li>
+              <li><span class="nm">sjcam aksiyon kamera</span><span class="vv">+193</span></li>
+              <li><span class="nm">anasayfa</span><span class="vv">+153</span></li>
+              <li><span class="nm">özdilek point happy aile seti</span><span class="vv">+52</span></li>
+              <li><span class="nm">acton pocket camera gimbal</span><span class="vv">+44</span></li>
+            </ul>
+            <ul class="insight-list" style="margin-top:18px;">
+              <li><b class="acc">Özdilek, Adidas ve Skechers</b> ikinci yarıda en belirgin oturum artışını göstermektedir.</li>
+              <li>Elektronik tarafında <b class="acc">Philips ve SJCAM</b> öne çıkmakta; kamera ürünleri yeni ilgi çekmektedir.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
   <!-- 10 Separator 03 -->
   <section data-screen-label="10 Bölüm 03">
     <div class="slide dark" style="display:flex;align-items:center;justify-content:center;">
@@ -314,14 +352,14 @@
         <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;max-width:830px;">llms.txt dosyası Şubat 2026'da eklenmiştir; "Önemli Sayfalar" altında 83 sayfa tanımlıdır, bunlardan 62'si AI trafiği verisinde gözlemlenmektedir. Aşağıda Şubat öncesi ve sonrası AI oturum karşılaştırması yer almaktadır.</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-top:26px;align-items:center;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-            <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v" style="font-size:42px;">37</div><div class="l">llms.txt · Şubat öncesi</div></div>
-            <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v" style="font-size:42px;">40</div><div class="l">llms.txt · Şubat sonrası</div></div>
-            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:42px;">13.930</div><div class="l">Diğer · Şubat öncesi</div></div>
-            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:42px;">24.230</div><div class="l">Diğer · Şubat sonrası</div></div>
+            <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v" style="font-size:40px;">37 → 40</div><div class="l">llms.txt sayfaları · doğrudan oturum (Şubat öncesi → sonrası)</div></div>
+            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:40px;">~38K</div><div class="l">İlişkili ürün keşfi · oturum (yaklaşık, örtüşmeli)</div></div>
+            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:40px;">13.930</div><div class="l">Diğer sayfalar · Şubat öncesi</div></div>
+            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:40px;">24.230</div><div class="l">Diğer sayfalar · Şubat sonrası</div></div>
           </div>
           <ul class="insight-list">
-            <li>llms.txt sayfaları ağırlıkla <b class="acc">kategori</b> niteliğindedir; bu sayfalardaki AI oturumu bu dönemde sınırlı seyretmektedir (<b class="acc">37 → 40</b>).</li>
-            <li>AI trafiğindeki büyüme ise ağırlıkla <b class="acc">ürün sayfalarında</b> gözlemlenmektedir (diğer sayfalar <b class="pos">13.930 → 24.230</b>).</li>
+            <li>llms.txt sayfaları ağırlıkla <b class="acc">kategori/marka</b> niteliğindedir; bu sayfaların doğrudan AI oturumu bu dönemde sınırlı seyretmektedir (<b class="acc">37 → 40</b>).</li>
+            <li>Buna karşın bu kategori ve markalardaki <b class="acc">ürünlere gelen ilişkili trafik daha geniş bir hacme</b> (yaklaşık 38K oturum, örtüşmeli) işaret etmektedir; kullanıcıların kategori yerine doğrudan ilgili ürün sayfalarına ulaşmış olabileceği değerlendirilebilir.</li>
             <li>llms.txt etkisinin daha sağlıklı ölçülebilmesi için kapsamın <b class="acc">öne çıkan ürün sayfalarıyla</b> genişletilmesi ve takibin sürdürülmesi değerlendirilebilir.</li>
           </ul>
         </div>

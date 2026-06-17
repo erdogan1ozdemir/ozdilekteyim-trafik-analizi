@@ -114,6 +114,22 @@ window.AU = (function(){
     return out;
   }
 
+  // ——— momentum: dönemin ilk yarısı vs ikinci yarısı oturum farkı ———
+  function momentum(rows, keyFn, filt) {
+    const half = Math.floor(MONTHS.length/2);
+    const early = new Set(MONTHS.slice(0, half));
+    const m = new Map();
+    for (const r of rows) {
+      if (filt && !filt(r)) continue;
+      const k = keyFn(r); if (k==null) continue;
+      if (!m.has(k)) m.set(k, {key:k, early:0, late:0});
+      const g = m.get(k); if (early.has(r.ym)) g.early += r.sessions; else g.late += r.sessions;
+    }
+    return [...m.values()].map(g=>({...g, diff:g.late-g.early, growth: g.early>0 ? (g.late-g.early)/g.early : null}))
+      .filter(g=>g.early+g.late>=8).sort((a,b)=>b.diff-a.diff);
+  }
+  function momentumLabels(){ const half=Math.floor(MONTHS.length/2); return { early:MONTHS.slice(0,half).map(trMonth), late:MONTHS.slice(half).map(trMonth) }; }
+
   // ——— tek bir LP'nin aylık serisi ———
   function lpSeries(lp, metric) {
     const rows = ROWS.filter(r=>r.lp===lp);
@@ -152,5 +168,6 @@ window.AU = (function(){
     fmtTRY, inMonths, totals, groupBy, monthlySeries,
     lpLabel, lpUrl, downloadPNG, deltaPct, deltaClass, METRICS,
     ALL_PTYPES, ALL_BRANDS, applyFilters, lpSeries, spark, llmsTokens, relatedProductRows,
+    momentum, momentumLabels,
   };
 })();

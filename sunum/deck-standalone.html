@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Özdilekteyim · AI Trafik Analizi · Inbound</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Inbound Design System - Core Tokens
+   Colors, type scale, and semantic CSS variables.
+   ============================================================ */
+/* ---------- Fonts ---------- */
+:root {
+  /* ---------- Brand colors ---------- */
+  --coral:        #FF7B52;   /* primary brand / accents / CTA bg */
+  --coral-tint:   #FFE3D8;   /* soft coral wash, pill hover, bg tint */
+  --coral-deep:   #E85F36;   /* hover/pressed coral */
+  --teal:         #10332F;   /* ink - headings + body */
+  --teal-soft:    #1A4238;   /* separator faded numeral, hover teal */
+  --mint:         #E8F5E9;   /* alt panel bg, success wash */
+  /* ---------- Neutrals ---------- */
+  --white:        #FFFFFF;
+  --off-white:    #FAF8F5;   /* rarely used - decks require pure white */
+  --ink:          #10332F;   /* = teal; semantic alias for body copy */
+  --ink-2:        #4A4A4A;   /* secondary copy, captions */
+  --ink-3:        #8A8A8A;   /* tertiary, metadata */
+  --line:         #E0E0E0;   /* borders, table dividers */
+  --line-soft:    #F0EDE8;   /* decorative grid lines on slides */
+  /* ---------- Data-viz / state ---------- */
+  --red:          #D32F2F;   /* negative, footnotes */
+  --red-wash:     #FFCDD2;   /* neg table cell */
+  --green:        #2E7D32;   /* positive */
+  --green-wash:   #C8E6C9;   /* pos table cell */
+  --gold:         #F5A623;   /* bar chart - previous period */
+  --gray-bar:     #4A4A4A;   /* bar chart - current period */
+  --trend-red:    #E53935;   /* line overlay */
+  /* ---------- Foreground / background semantics ---------- */
+  --fg-1: var(--teal);       /* strongest copy */
+  --fg-2: var(--ink-2);       /* secondary copy */
+  --fg-3: var(--ink-3);       /* tertiary copy */
+  --fg-accent: var(--coral);
+  --fg-inverse: var(--white);
+  --bg-1: var(--white);       /* default slide / page background */
+  --bg-2: var(--off-white);   /* subtle section contrast */
+  --bg-accent: var(--coral);  /* cover, closing, agenda left panel */
+  --bg-ink: var(--teal);      /* section separator */
+  --bg-mint: var(--mint);
+  /* ---------- Type families ---------- */
+  --font-display: 'Bricolage Grotesque', 'Calibri', system-ui, sans-serif;
+  --font-body:    'Outfit', 'Calibri', system-ui, sans-serif;
+  /* ---------- Type scale (slide punto → web px) ---------- */
+  /* Display */
+  --t-cover:       clamp(44px, 5.6vw, 72px);     /* cover / closing */
+  --t-section:     clamp(36px, 3.8vw, 56px);     /* separator title */
+  --t-section-num: clamp(140px, 14vw, 220px);    /* big numeral */
+  --t-h1:          clamp(36px, 3vw, 48px);       /* page hero */
+  --t-h2:          clamp(28px, 2.4vw, 36px);     /* slide title */
+  --t-h3:          clamp(22px, 1.6vw, 26px);     /* card title */
+  --t-h4:          18px;
+  /* Body */
+  --t-lead:   18px;
+  --t-body:   16px;
+  --t-sm:     14px;
+  --t-xs:     12px;
+  --t-micro:  10px;
+  /* Data / KPI */
+  --t-kpi:     clamp(40px, 4.2vw, 60px);
+  --t-metric:  clamp(24px, 2vw, 32px);
+  /* ---------- Leading ---------- */
+  --lh-tight:   1.05;
+  --lh-display: 1.1;
+  --lh-snug:    1.25;
+  --lh-body:    1.5;
+  --lh-loose:   1.65;
+  /* ---------- Letter spacing ---------- */
+  --ls-display: -0.02em;
+  --ls-tight:   -0.01em;
+  --ls-normal:   0;
+  --ls-caps:    0.08em;
+  --ls-micro:   0.04em;
+  /* ---------- Radii (matches .15"/.2" slide radii) ---------- */
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;        /* card default */
+  --r-xl: 20px;        /* image panels */
+  --r-pill: 999px;
+  /* ---------- Spacing (8pt baseline) ---------- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --s-16: 64px;
+  --s-20: 80px;
+  --s-24: 96px;
+  /* ---------- Elevation ---------- */
+  --shadow-card: 0 2px 8px rgba(16, 51, 47, 0.08);
+  --shadow-card-hover: 0 6px 20px rgba(16, 51, 47, 0.12);
+  --shadow-pop: 0 12px 32px rgba(16, 51, 47, 0.16);
+  --shadow-inner: inset 0 0 0 1px rgba(16, 51, 47, 0.06);
+  /* ---------- Motion ---------- */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+}
+/* ============================================================
+   Semantic element styles - apply via class for isolation
+   ============================================================ */
+.inbound-root, body.inbound {
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  color: var(--fg-1);
+  background: var(--bg-1);
+  -webkit-font-smoothing: antialiased;
+}
+.inbound h1, .h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-h1);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  color: var(--fg-1);
+}
+.inbound h2, .h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-h2);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  color: var(--fg-1);
+}
+.inbound h3, .h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-h3);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-tight);
+  color: var(--fg-1);
+}
+.inbound h4, .h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--t-h4);
+  line-height: var(--lh-snug);
+  color: var(--fg-1);
+}
+.inbound p, .body { font-size: var(--t-body); line-height: var(--lh-body); color: var(--fg-1); }
+.inbound .lead, .lead { font-size: var(--t-lead); line-height: var(--lh-body); color: var(--fg-1); }
+.inbound small, .small, .caption { font-size: var(--t-sm); color: var(--fg-2); }
+.inbound .micro { font-size: var(--t-xs); color: var(--fg-2); letter-spacing: var(--ls-micro); }
+/* Highlights - the signature coral underline block */
+.highlight-coral {
+  background: linear-gradient(to top, var(--coral) 28%, transparent 28%);
+  padding: 0 .06em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.accent-coral { color: var(--coral); }
+.accent-teal  { color: var(--teal); }
+/* Breadcrumb (slide header) */
+.breadcrumb {
+  display: inline-flex; gap: 6px; align-items: baseline;
+  font-size: var(--t-xs);
+  color: var(--coral);
+}
+.breadcrumb .section { font-family: var(--font-display); font-weight: 700; }
+.breadcrumb .sep { opacity: .7; }
+.breadcrumb .title { font-family: var(--font-body); font-weight: 400; opacity: .9; }
+/* Source pill */
+.source-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--coral); color: var(--white);
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--t-micro);
+  padding: 6px 10px; border-radius: var(--r-sm);
+}
+/* Insight arrow bullets */
+.insight-list { list-style: none; padding: 0; margin: 0; }
+.insight-list li { position: relative; padding-left: 22px; margin-bottom: 14px; font-size: var(--t-sm); line-height: var(--lh-body); }
+.insight-list li::before {
+  content: "➔"; position: absolute; left: 0; top: 0;
+  color: var(--teal); font-family: var(--font-body);
+}
+/* Utility: decorative vertical grid lines */
+.slide-gridlines {
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0, transparent calc(20% - 0.5px),
+    var(--line-soft) calc(20% - 0.5px), var(--line-soft) 20%
+  );
+}
+
+/* Shared slide styles - 1280×720 stage, scaled via deck_stage. */
+
+
+html, body { margin: 0; padding: 0; background: var(--teal); }
+
+.slide {
+  width: 1280px; height: 720px;
+  position: relative;
+  background: #fff;
+  color: var(--teal);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.slide .breadcrumb-top {
+  position: absolute; top: 28px; left: 48px;
+  font-size: 12px; letter-spacing: 0.02em;
+}
+.slide .breadcrumb-top .section { font-family: var(--font-display); font-weight: 700; color: var(--coral); }
+.slide .breadcrumb-top .sep { color: var(--coral); margin: 0 6px; opacity: .6; }
+.slide .breadcrumb-top .title { font-family: var(--font-body); color: var(--coral); opacity: .9; }
+
+.slide .logo-bl {
+  position: absolute; left: 44px; bottom: 32px;
+  width: 36px; height: 36px;
+  background: url(data:image/png;base64,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) no-repeat center/contain;
+}
+.slide.dark .logo-bl { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE8AAABOCAYAAABhaEsjAAAABHNCSVQICAgIfAhkiAAAA29JREFUeJztnEuCqyAUBS/ZWNMre2Rl4srOG6hpgwIX5CdYk5ioiBV+IiCoIQDIdVMau/S2IYTQ1Aii1oUBqHXzh46yOOj1801UR2oxeWuqkhQvy4emiiKzAEChPBOAqfa9R1NJ2hmqtgs2aEeaiartxgralbZnwl+N3ga4h7g99ctDALK2hQtMuJgKo5sqWMqQf1cu3gi/sU2bV8xJHYkjIppQqjLB/co3LnkFol9xG3kEon9xG2yBrAoDS61Uv3ovx1sIoXwHeeUNKG7DWwtz5E2UpxekeYQQTj/OnZnFaSKad9sfzv5xHBu0kpburW07B87sa5WXOLu+PxdklCUx4LsXOmWfIav8MyMzXa21QmquHGB5fLx6Hwi9aGyzpLowGxdFqpAL5Qu8MrESuYGHpDqV91bzESFRcQLsWppJiERfQJxAVJnbKgt4OU65AvDJs5/cAfDnvPOmm+dEVfY26uJKRLYTbPJGfK51CVTcg4cUt8F2YrEsy0e5LbxZ15JlZZ3otoXFjdofYCbPobOrCY7NGLXfacqT1WLaKGeJ6+zVo+5miFZa3qe/PqmOh1lpiO3H7QBf1/PImJ5eRkrTxWN0L/S2AUBGDbcYmHn/xZQ30wMX+aJBXysmQL/oKedC+Nl/MbPtDz2weZoqARyaKjUjcyesDw/Gs60qGqubYDiabDvC3pAPAI7dUl8dA7NxsCodwcaxj78+6a96OghWTlLd0c3JAcNnX4u4oxez3DsUjAPCdmLJusMKtIg7ZtndCTaGEuhISE55NtvuEzvBI+2QiEK7pCZ02oxBiilhHvOff6CnVMhIcbycFxDQ7SUG3qviBhrKrSQGSgMQ0OaNCbx1ies9RQ9UD73YVaqLvCjscx+28F2TWBSlm5CsaanJNVG+RWPwnUJSxd06B803fUoljISJXj9nip8+RZRvhSCiZejJr20nZ+LeqB0ETnFEvDUGnAF0zPnAnh1eeWsW8gbUGawVL1gvgNZZf6MIfGep0BJU+62jkksbRGBecR0LjBJ3ZTkkSX0s3BA+kzsFSDSTuiKyuLQTiVNtC4Go2s6+wH1SoartygrarUxUbTds0I5EVdtFNFiX3e1RWulFpomWLi5pPzIaTWv3VqkZTFVGgRoiieKXN5+J8q0S5KOpIbT4bndJY7cmamvp8v+hfB26NuGVeQAAAABJRU5ErkJggg==); }
+.slide.coral .logo-bl { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE8AAABOCAYAAABhaEsjAAAABHNCSVQICAgIfAhkiAAAA29JREFUeJztnEuCqyAUBS/ZWNMre2Rl4srOG6hpgwIX5CdYk5ioiBV+IiCoIQDIdVMau/S2IYTQ1Aii1oUBqHXzh46yOOj1801UR2oxeWuqkhQvy4emiiKzAEChPBOAqfa9R1NJ2hmqtgs2aEeaiartxgralbZnwl+N3ga4h7g99ctDALK2hQtMuJgKo5sqWMqQf1cu3gi/sU2bV8xJHYkjIppQqjLB/co3LnkFol9xG3kEon9xG2yBrAoDS61Uv3ovx1sIoXwHeeUNKG7DWwtz5E2UpxekeYQQTj/OnZnFaSKad9sfzv5xHBu0kpburW07B87sa5WXOLu+PxdklCUx4LsXOmWfIav8MyMzXa21QmquHGB5fLx6Hwi9aGyzpLowGxdFqpAL5Qu8MrESuYGHpDqV91bzESFRcQLsWppJiERfQJxAVJnbKgt4OU65AvDJs5/cAfDnvPOmm+dEVfY26uJKRLYTbPJGfK51CVTcg4cUt8F2YrEsy0e5LbxZ15JlZZ3otoXFjdofYCbPobOrCY7NGLXfacqT1WLaKGeJ6+zVo+5miFZa3qe/PqmOh1lpiO3H7QBf1/PImJ5eRkrTxWN0L/S2AUBGDbcYmHn/xZQ30wMX+aJBXysmQL/oKedC+Nl/MbPtDz2weZoqARyaKjUjcyesDw/Gs60qGqubYDiabDvC3pAPAI7dUl8dA7NxsCodwcaxj78+6a96OghWTlLd0c3JAcNnX4u4oxez3DsUjAPCdmLJusMKtIg7ZtndCTaGEuhISE55NtvuEzvBI+2QiEK7pCZ02oxBiilhHvOff6CnVMhIcbycFxDQ7SUG3qviBhrKrSQGSgMQ0OaNCbx1ies9RQ9UD73YVaqLvCjscx+28F2TWBSlm5CsaanJNVG+RWPwnUJSxd06B803fUoljISJXj9nip8+RZRvhSCiZejJr20nZ+LeqB0ETnFEvDUGnAF0zPnAnh1eeWsW8gbUGawVL1gvgNZZf6MIfGep0BJU+62jkksbRGBecR0LjBJ3ZTkkSX0s3BA+kzsFSDSTuiKyuLQTiVNtC4Go2s6+wH1SoartygrarUxUbTds0I5EVdtFNFiX3e1RWulFpomWLi5pPzIaTWv3VqkZTFVGgRoiieKXN5+J8q0S5KOpIbT4bndJY7cmamvp8v+hfB26NuGVeQAAAABJRU5ErkJggg==); }
+
+.slide .source-pill {
+  position: absolute; left: 100px; bottom: 36px;
+  background: var(--coral); color: #fff;
+  font-family: var(--font-display); font-weight: 700; font-size: 11px;
+  padding: 6px 12px; border-radius: 8px;
+}
+
+.slide h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin: 0; }
+.slide h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
+.slide p  { font-family: var(--font-body); line-height: 1.55; margin: 0; }
+
+.hl { background: linear-gradient(to top, var(--coral) 28%, transparent 28%); box-decoration-break: clone; -webkit-box-decoration-break: clone; padding: 0 0.06em; }
+
+.slide.coral { background: var(--coral); color: #fff; }
+.slide.dark  { background: var(--teal); color: #fff; }
+
+.gridlines::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right, transparent calc(20% - 0.5px), #F0EDE8 calc(20% - 0.5px), #F0EDE8 20%, transparent 20%),
+    linear-gradient(to right, transparent calc(40% - 0.5px), #F0EDE8 calc(40% - 0.5px), #F0EDE8 40%, transparent 40%),
+    linear-gradient(to right, transparent calc(60% - 0.5px), #F0EDE8 calc(60% - 0.5px), #F0EDE8 60%, transparent 60%),
+    linear-gradient(to right, transparent calc(80% - 0.5px), #F0EDE8 calc(80% - 0.5px), #F0EDE8 80%, transparent 80%);
+  opacity: .6;
+}
+.slide > * { position: relative; z-index: 1; }
+
+/* coral accent line */
+.accent-line { width: 60px; height: 3.5px; background: var(--coral); border-radius: 999px; display: block; }
+.slide.coral .accent-line, .slide.dark .accent-line { background: #fff; }
+
+</style>
+<style>
+  html, body { margin:0; padding:0; background:#10332F; }
+  deck-stage > section { width: 1280px; height: 720px; }
+  deck-stage > section > .slide { width:100%; height:100%; box-sizing:border-box; }
+  /* sunum-özel yardımcılar */
+  .kpi-card { border-radius:16px; padding:24px 20px; text-align:center; }
+  .kpi-card .v { font-family:var(--font-display); font-weight:700; font-size:52px; line-height:1; letter-spacing:-.02em; }
+  .kpi-card .v small { font-size:26px; }
+  .kpi-card .l { font-family:var(--font-body); font-size:11.5px; opacity:.9; letter-spacing:.04em; margin-top:10px; text-transform:uppercase; }
+  .bars { display:flex; align-items:flex-end; gap:18px; height:300px; padding-top:30px; }
+  .bars .col { flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; }
+  .bars .bar { width:64%; background:var(--coral); border-radius:7px 7px 0 0; position:relative; }
+  .bars .bar.partial { background:repeating-linear-gradient(45deg,var(--coral) 0 6px,#ffd9c9 6px 12px); }
+  .bars .val { font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--teal); margin-bottom:7px; }
+  .bars .rev { font-family:var(--font-body); font-size:10.5px; color:var(--coral-deep); margin-bottom:3px; font-weight:600; }
+  .bars .mon { font-family:var(--font-body); font-size:12px; color:var(--ink-2); margin-top:10px; }
+  .ptbl { width:100%; border-collapse:collapse; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(16,51,47,.06); font-family:var(--font-body); font-size:13px; }
+  .ptbl thead tr { background:var(--teal); color:#fff; }
+  .ptbl th { padding:11px 14px; text-align:left; font-family:var(--font-display); font-weight:700; font-size:11.5px; letter-spacing:.04em; }
+  .ptbl th.n, .ptbl td.n { text-align:right; font-variant-numeric:tabular-nums; }
+  .ptbl td { padding:9px 14px; border-top:1px solid #E0E0E0; }
+  .ptbl td.n { font-family:var(--font-display); font-weight:500; }
+  .minilist { list-style:none; padding:0; margin:0; }
+  .minilist li { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid var(--line-soft); font-size:12.5px; }
+  .minilist li .nm { color:var(--teal); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .minilist li .vv { font-family:var(--font-display); font-weight:700; color:var(--coral-deep); white-space:nowrap; }
+  .col-card { background:#fff; border-radius:16px; padding:20px 18px; box-shadow:0 2px 8px rgba(16,51,47,.08); }
+  .col-card h4 { margin:0 0 10px; font-family:var(--font-display); font-weight:700; font-size:15px; color:var(--teal); }
+  .col-card h4 .tag { font-size:10px; font-weight:600; color:var(--coral); display:block; letter-spacing:.06em; text-transform:uppercase; margin-bottom:2px; }
+  .bbar-row { display:flex; align-items:center; gap:12px; margin-bottom:11px; }
+  .bbar-row .nm { width:120px; font-size:13px; color:var(--teal); font-weight:600; }
+  .bbar-row .track { flex:1; height:18px; background:var(--line-soft); border-radius:999px; overflow:hidden; display:block; }
+  .bbar-row .fill { display:block; height:100%; background:var(--coral); border-radius:999px; }
+  .bbar-row .vv { width:78px; text-align:right; font-family:var(--font-display); font-weight:700; font-size:13px; color:var(--teal); font-variant-numeric:tabular-nums; }
+  .llms-badge { display:inline-block; font-size:10px; font-weight:700; color:var(--coral-deep); border:1px solid var(--coral); border-radius:999px; padding:1px 6px; margin-left:6px; }
+  b.pos { color:var(--green); font-family:var(--font-display); }
+  b.neg { color:var(--red); font-family:var(--font-display); }
+  b.acc { color:var(--coral-deep); font-family:var(--font-display); }
+</style>
+<script>
+/**
+ * <deck-stage> — reusable web component for HTML decks.
+ *
+ * Handles:
+ *  (a) speaker notes — reads <script type="application/json" id="speaker-notes">
+ *      and posts {slideIndexChanged: N} to the parent window on nav.
+ *  (b) keyboard navigation — ←/→, PgUp/PgDn, Space, Home/End, number keys.
+ *  (c) press R to reset to slide 0 (with a tasteful keyboard hint).
+ *  (d) bottom-center overlay showing slide count + hints, fades out on idle.
+ *  (e) auto-scaling — inner canvas is a fixed design size (default 1920×1080)
+ *      scaled with `transform: scale()` to fit the viewport, letterboxed.
+ *      Set the `noscale` attribute to render at authored size (1:1) — the
+ *      PPTX exporter sets this so its DOM capture sees unscaled geometry.
+ *  (f) print — `@media print` lays every slide out as its own page at the
+ *      design size, so the browser's Print → Save as PDF produces a clean
+ *      one-page-per-slide PDF with no extra setup.
+ *
+ * Slides are HIDDEN, not unmounted. Non-active slides stay in the DOM with
+ * `visibility: hidden` + `opacity: 0`, so their state (videos, iframes,
+ * form inputs, React trees) is preserved across navigation.
+ *
+ * Lifecycle event — the component dispatches a `slidechange` CustomEvent on
+ * itself whenever the active slide changes (including the initial mount).
+ * The event bubbles and composes out of shadow DOM, so you can listen on
+ * the <deck-stage> element or on document:
+ *
+ *   document.querySelector('deck-stage').addEventListener('slidechange', (e) => {
+ *     e.detail.index         // new 0-based index
+ *     e.detail.previousIndex // previous index, or -1 on init
+ *     e.detail.total         // total slide count
+ *     e.detail.slide         // the new active slide element
+ *     e.detail.previousSlide // the prior slide element, or null on init
+ *     e.detail.reason        // 'init' | 'keyboard' | 'click' | 'tap' | 'api'
+ *   });
+ *
+ * Persistence: none at the deck level. The host app keeps the current slide
+ * in its own URL (?slide=) and re-delivers it via location.hash on load, so a
+ * bare load with no hash always starts at slide 1.
+ *
+ * Usage:
+ *   <deck-stage width="1920" height="1080">
+ *     <section data-label="Title">...</section>
+ *     <section data-label="Agenda">...</section>
+ *   </deck-stage>
+ *
+ * Slides are the direct element children of <deck-stage>. Each slide is
+ * automatically tagged with:
+ *   - data-screen-label="NN Label"   (1-indexed, for comment flow)
+ *   - data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text"
+ */
+
+(() => {
+  const DESIGN_W_DEFAULT = 1920;
+  const DESIGN_H_DEFAULT = 1080;
+  const OVERLAY_HIDE_MS = 1800;
+  const VALIDATE_ATTR = 'no_overflowing_text,no_overlapping_text,slide_sized_text';
+
+  const pad2 = (n) => String(n).padStart(2, '0');
+
+  const stylesheet = `
+    :host {
+      position: fixed;
+      inset: 0;
+      display: block;
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .canvas {
+      position: relative;
+      transform-origin: center center;
+      flex-shrink: 0;
+      background: #fff;
+      will-change: transform;
+    }
+
+    /* Slides live in light DOM (via <slot>) so authored CSS still applies.
+       We absolutely position each slotted child to stack them. */
+    ::slotted(*) {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+    ::slotted([data-deck-active]) {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+
+    /* Tap zones for mobile — back/forward thirds like Stories.
+       Transparent, no visible UI, don't block the overlay. */
+    .tapzones {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      z-index: 2147482000;
+      pointer-events: none;
+    }
+    .tapzone {
+      flex: 1;
+      pointer-events: auto;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Only activate tap zones on coarse pointers (touch devices). */
+    @media (hover: hover) and (pointer: fine) {
+      .tapzones { display: none; }
+    }
+
+    .overlay {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translate(-50%, 6px) scale(0.92);
+      filter: blur(6px);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      background: #000;
+      color: #fff;
+      border-radius: 999px;
+      font-size: 12px;
+      font-feature-settings: "tnum" 1;
+      letter-spacing: 0.01em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 260ms ease, transform 260ms cubic-bezier(.2,.8,.2,1), filter 260ms ease;
+      transform-origin: center bottom;
+      z-index: 2147483000;
+      user-select: none;
+    }
+    .overlay[data-visible] {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, 0) scale(1);
+      filter: blur(0);
+    }
+
+    .btn {
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      border: 0;
+      margin: 0;
+      padding: 0;
+      color: inherit;
+      font: inherit;
+      cursor: default;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 28px;
+      min-width: 28px;
+      border-radius: 999px;
+      color: rgba(255,255,255,0.72);
+      transition: background 140ms ease, color 140ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    .btn:active { background: rgba(255,255,255,0.18); }
+    .btn:focus { outline: none; }
+    .btn:focus-visible { outline: none; }
+    .btn::-moz-focus-inner { border: 0; }
+    .btn svg { width: 14px; height: 14px; display: block; }
+    .btn.reset {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      padding: 0 10px 0 12px;
+      gap: 6px;
+      color: rgba(255,255,255,0.72);
+    }
+    .btn.reset .kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 10px;
+      line-height: 1;
+      color: rgba(255,255,255,0.88);
+      background: rgba(255,255,255,0.12);
+      border-radius: 4px;
+    }
+
+    .count {
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+      font-weight: 500;
+      padding: 0 8px;
+      min-width: 42px;
+      text-align: center;
+      font-size: 12px;
+    }
+    .count .sep { color: rgba(255,255,255,0.45); margin: 0 3px; font-weight: 400; }
+    .count .total { color: rgba(255,255,255,0.55); }
+
+    .divider {
+      width: 1px;
+      height: 14px;
+      background: rgba(255,255,255,0.18);
+      margin: 0 2px;
+    }
+
+    /* ── Print: one page per slide, no chrome ────────────────────────────
+       The screen layout stacks every slide at inset:0 inside a scaled
+       canvas; for print we want them in document flow at the authored
+       design size so the browser paginates one slide per sheet. The
+       @page size is set from the width/height attributes via the inline
+       <style id="deck-stage-print-page"> that connectedCallback injects
+       into <head> (the @page at-rule has no effect inside shadow DOM). */
+    @media print {
+      :host {
+        position: static;
+        inset: auto;
+        background: none;
+        overflow: visible;
+        color: inherit;
+      }
+      .stage { position: static; display: block; }
+      .canvas {
+        transform: none !important;
+        width: auto !important;
+        height: auto !important;
+        background: none;
+        will-change: auto;
+      }
+      ::slotted(*) {
+        position: relative !important;
+        inset: auto !important;
+        width: var(--deck-design-w) !important;
+        height: var(--deck-design-h) !important;
+        box-sizing: border-box !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto;
+        break-after: page;
+        page-break-after: always;
+        break-inside: avoid;
+        overflow: hidden;
+      }
+      ::slotted(*:last-child) {
+        break-after: auto;
+        page-break-after: auto;
+      }
+      .overlay, .tapzones { display: none !important; }
+    }
+  `;
+
+  class DeckStage extends HTMLElement {
+    static get observedAttributes() { return ['width', 'height', 'noscale']; }
+
+    constructor() {
+      super();
+      this._root = this.attachShadow({ mode: 'open' });
+      this._index = 0;
+      this._slides = [];
+      this._notes = [];
+      this._hideTimer = null;
+      this._mouseIdleTimer = null;
+
+      this._onKey = this._onKey.bind(this);
+      this._onResize = this._onResize.bind(this);
+      this._onSlotChange = this._onSlotChange.bind(this);
+      this._onMouseMove = this._onMouseMove.bind(this);
+      this._onTapBack = this._onTapBack.bind(this);
+      this._onTapForward = this._onTapForward.bind(this);
+    }
+
+    get designWidth() {
+      return parseInt(this.getAttribute('width'), 10) || DESIGN_W_DEFAULT;
+    }
+    get designHeight() {
+      return parseInt(this.getAttribute('height'), 10) || DESIGN_H_DEFAULT;
+    }
+
+    connectedCallback() {
+      this._render();
+      this._loadNotes();
+      this._syncPrintPageRule();
+      window.addEventListener('keydown', this._onKey);
+      window.addEventListener('resize', this._onResize);
+      window.addEventListener('mousemove', this._onMouseMove, { passive: true });
+      // Initial collection + layout happens via slotchange, which fires on mount.
+    }
+
+    disconnectedCallback() {
+      window.removeEventListener('keydown', this._onKey);
+      window.removeEventListener('resize', this._onResize);
+      window.removeEventListener('mousemove', this._onMouseMove);
+      if (this._hideTimer) clearTimeout(this._hideTimer);
+      if (this._mouseIdleTimer) clearTimeout(this._mouseIdleTimer);
+    }
+
+    attributeChangedCallback() {
+      if (this._canvas) {
+        this._canvas.style.width = this.designWidth + 'px';
+        this._canvas.style.height = this.designHeight + 'px';
+        this._canvas.style.setProperty('--deck-design-w', this.designWidth + 'px');
+        this._canvas.style.setProperty('--deck-design-h', this.designHeight + 'px');
+        this._fit();
+        this._syncPrintPageRule();
+      }
+    }
+
+    _render() {
+      const style = document.createElement('style');
+      style.textContent = stylesheet;
+
+      const stage = document.createElement('div');
+      stage.className = 'stage';
+
+      const canvas = document.createElement('div');
+      canvas.className = 'canvas';
+      canvas.style.width = this.designWidth + 'px';
+      canvas.style.height = this.designHeight + 'px';
+      canvas.style.setProperty('--deck-design-w', this.designWidth + 'px');
+      canvas.style.setProperty('--deck-design-h', this.designHeight + 'px');
+
+      const slot = document.createElement('slot');
+      slot.addEventListener('slotchange', this._onSlotChange);
+      canvas.appendChild(slot);
+      stage.appendChild(canvas);
+
+      // Tap zones (mobile): left third = back, right third = forward.
+      const tapzones = document.createElement('div');
+      tapzones.className = 'tapzones export-hidden';
+      tapzones.setAttribute('aria-hidden', 'true');
+      tapzones.setAttribute('data-noncommentable', '');
+      const tzBack = document.createElement('div');
+      tzBack.className = 'tapzone tapzone--back';
+      const tzMid = document.createElement('div');
+      tzMid.className = 'tapzone tapzone--mid';
+      tzMid.style.pointerEvents = 'none';
+      const tzFwd = document.createElement('div');
+      tzFwd.className = 'tapzone tapzone--fwd';
+      tzBack.addEventListener('click', this._onTapBack);
+      tzFwd.addEventListener('click', this._onTapForward);
+      tapzones.append(tzBack, tzMid, tzFwd);
+
+      // Overlay: compact, solid black, with clickable controls.
+      const overlay = document.createElement('div');
+      overlay.className = 'overlay export-hidden';
+      overlay.setAttribute('role', 'toolbar');
+      overlay.setAttribute('aria-label', 'Deck controls');
+      overlay.setAttribute('data-noncommentable', '');
+      overlay.innerHTML = `
+        <button class="btn prev" type="button" aria-label="Previous slide" title="Previous (←)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg>
+        </button>
+        <span class="count" aria-live="polite"><span class="current">1</span><span class="sep">/</span><span class="total">1</span></span>
+        <button class="btn next" type="button" aria-label="Next slide" title="Next (→)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg>
+        </button>
+        <span class="divider"></span>
+        <button class="btn reset" type="button" aria-label="Reset to first slide" title="Reset (R)">Reset<span class="kbd">R</span></button>
+      `;
+
+      overlay.querySelector('.prev').addEventListener('click', () => this._go(this._index - 1, 'click'));
+      overlay.querySelector('.next').addEventListener('click', () => this._go(this._index + 1, 'click'));
+      overlay.querySelector('.reset').addEventListener('click', () => this._go(0, 'click'));
+
+      this._root.append(style, stage, tapzones, overlay);
+      this._canvas = canvas;
+      this._slot = slot;
+      this._overlay = overlay;
+      this._countEl = overlay.querySelector('.current');
+      this._totalEl = overlay.querySelector('.total');
+    }
+
+    /** @page must live in the document stylesheet — it's a no-op inside
+     *  shadow DOM. Inject/update a single <head> style tag so the print
+     *  sheet matches the design size and Save-as-PDF yields one slide per
+     *  page with no margins. */
+    _syncPrintPageRule() {
+      const id = 'deck-stage-print-page';
+      let tag = document.getElementById(id);
+      if (!tag) {
+        tag = document.createElement('style');
+        tag.id = id;
+        document.head.appendChild(tag);
+      }
+      tag.textContent =
+        '@page { size: ' + this.designWidth + 'px ' + this.designHeight + 'px; margin: 0; } ' +
+        '@media print { html, body { margin: 0 !important; padding: 0 !important; background: none !important; overflow: visible !important; height: auto !important; } ' +
+        '* { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }';
+    }
+
+    _onSlotChange() {
+      this._collectSlides();
+      this._restoreIndex();
+      this._applyIndex({ showOverlay: false, broadcast: true, reason: 'init' });
+      this._fit();
+    }
+
+    _collectSlides() {
+      const assigned = this._slot.assignedElements({ flatten: true });
+      this._slides = assigned.filter((el) => {
+        // Skip template/style/script nodes even if someone slots them.
+        const tag = el.tagName;
+        return tag !== 'TEMPLATE' && tag !== 'SCRIPT' && tag !== 'STYLE';
+      });
+
+      this._slides.forEach((slide, i) => {
+        const n = i + 1;
+        // Determine a label for comment flow: prefer explicit data-label,
+        // then an existing data-screen-label, then first heading, else "Slide".
+        let label = slide.getAttribute('data-label');
+        if (!label) {
+          const existing = slide.getAttribute('data-screen-label');
+          if (existing) {
+            // Strip any leading number the author may have included.
+            label = existing.replace(/^\s*\d+\s*/, '').trim() || existing;
+          }
+        }
+        if (!label) {
+          const h = slide.querySelector('h1, h2, h3, [data-title]');
+          if (h) label = (h.textContent || '').trim().slice(0, 40);
+        }
+        if (!label) label = 'Slide';
+        slide.setAttribute('data-screen-label', `${pad2(n)} ${label}`);
+
+        // Validation attribute for comment flow / auto-checks.
+        if (!slide.hasAttribute('data-om-validate')) {
+          slide.setAttribute('data-om-validate', VALIDATE_ATTR);
+        }
+
+        slide.setAttribute('data-deck-slide', String(i));
+      });
+
+      if (this._totalEl) this._totalEl.textContent = String(this._slides.length || 1);
+      if (this._index >= this._slides.length) this._index = Math.max(0, this._slides.length - 1);
+    }
+
+    _loadNotes() {
+      const tag = document.getElementById('speaker-notes');
+      if (!tag) { this._notes = []; return; }
+      try {
+        const parsed = JSON.parse(tag.textContent || '[]');
+        if (Array.isArray(parsed)) this._notes = parsed;
+      } catch (e) {
+        console.warn('[deck-stage] Failed to parse #speaker-notes JSON:', e);
+        this._notes = [];
+      }
+    }
+
+    _restoreIndex() {
+      // The host's ?slide= param is delivered as a #<int> hash (1-indexed) on
+      // the iframe src. No hash → slide 1; the deck itself keeps no position
+      // state across loads.
+      const h = (location.hash || '').match(/^#(\d+)$/);
+      if (h) {
+        const n = parseInt(h[1], 10) - 1;
+        if (n >= 0 && n < this._slides.length) this._index = n;
+      }
+    }
+
+    _applyIndex({ showOverlay = true, broadcast = true, reason = 'init' } = {}) {
+      if (!this._slides.length) return;
+      const prev = this._prevIndex == null ? -1 : this._prevIndex;
+      const curr = this._index;
+      // Keep the iframe's own hash in sync so an in-iframe location.reload()
+      // (reload banner path in viewer-handle.ts) lands on the current slide,
+      // not the stale deep-link hash from initial load.
+      try { history.replaceState(null, '', '#' + (curr + 1)); } catch (e) {}
+      this._slides.forEach((s, i) => {
+        if (i === curr) s.setAttribute('data-deck-active', '');
+        else s.removeAttribute('data-deck-active');
+      });
+      if (this._countEl) this._countEl.textContent = String(curr + 1);
+
+      if (broadcast) {
+        // (1) Legacy: host-window postMessage for speaker-notes renderers.
+        try { window.postMessage({ slideIndexChanged: curr }, '*'); } catch (e) {}
+
+        // (2) In-page CustomEvent on the <deck-stage> element itself.
+        //     Bubbles and composes out of shadow DOM so slide code can listen:
+        //       document.querySelector('deck-stage').addEventListener('slidechange', e => {
+        //         e.detail.index, e.detail.previousIndex, e.detail.total, e.detail.slide, e.detail.reason
+        //       });
+        const detail = {
+          index: curr,
+          previousIndex: prev,
+          total: this._slides.length,
+          slide: this._slides[curr] || null,
+          previousSlide: prev >= 0 ? (this._slides[prev] || null) : null,
+          reason: reason, // 'init' | 'keyboard' | 'click' | 'tap' | 'api'
+        };
+        this.dispatchEvent(new CustomEvent('slidechange', {
+          detail,
+          bubbles: true,
+          composed: true,
+        }));
+      }
+
+      this._prevIndex = curr;
+      if (showOverlay) this._flashOverlay();
+    }
+
+    _flashOverlay() {
+      if (!this._overlay) return;
+      this._overlay.setAttribute('data-visible', '');
+      if (this._hideTimer) clearTimeout(this._hideTimer);
+      this._hideTimer = setTimeout(() => {
+        this._overlay.removeAttribute('data-visible');
+      }, OVERLAY_HIDE_MS);
+    }
+
+    _fit() {
+      if (!this._canvas) return;
+      // PPTX export sets noscale so the DOM capture sees authored-size
+      // geometry — the scaled canvas is in shadow DOM, so the exporter's
+      // resetTransformSelector can't reach .canvas.style.transform directly.
+      if (this.hasAttribute('noscale')) {
+        this._canvas.style.transform = 'none';
+        return;
+      }
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const s = Math.min(vw / this.designWidth, vh / this.designHeight);
+      this._canvas.style.transform = `scale(${s})`;
+    }
+
+    _onResize() { this._fit(); }
+
+    _onMouseMove() {
+      // Keep overlay visible while mouse moves; hide after idle.
+      this._flashOverlay();
+    }
+
+    _onTapBack(e) {
+      e.preventDefault();
+      this._go(this._index - 1, 'tap');
+    }
+
+    _onTapForward(e) {
+      e.preventDefault();
+      this._go(this._index + 1, 'tap');
+    }
+
+    _onKey(e) {
+      // Ignore when the user is typing.
+      const t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      const key = e.key;
+      let handled = true;
+
+      if (key === 'ArrowRight' || key === 'PageDown' || key === ' ' || key === 'Spacebar') {
+        this._go(this._index + 1, 'keyboard');
+      } else if (key === 'ArrowLeft' || key === 'PageUp') {
+        this._go(this._index - 1, 'keyboard');
+      } else if (key === 'Home') {
+        this._go(0, 'keyboard');
+      } else if (key === 'End') {
+        this._go(this._slides.length - 1, 'keyboard');
+      } else if (key === 'r' || key === 'R') {
+        this._go(0, 'keyboard');
+      } else if (/^[0-9]$/.test(key)) {
+        // 1..9 jump to that slide; 0 jumps to 10.
+        const n = key === '0' ? 9 : parseInt(key, 10) - 1;
+        if (n < this._slides.length) this._go(n, 'keyboard');
+      } else {
+        handled = false;
+      }
+
+      if (handled) {
+        e.preventDefault();
+        this._flashOverlay();
+      }
+    }
+
+    _go(i, reason = 'api') {
+      if (!this._slides.length) return;
+      const clamped = Math.max(0, Math.min(this._slides.length - 1, i));
+      if (clamped === this._index) {
+        this._flashOverlay();
+        return;
+      }
+      this._index = clamped;
+      this._applyIndex({ showOverlay: true, broadcast: true, reason });
+    }
+
+    // Public API ------------------------------------------------------------
+
+    /** Current slide index (0-based). */
+    get index() { return this._index; }
+    /** Total slide count. */
+    get length() { return this._slides.length; }
+    /** Programmatically navigate. */
+    goTo(i) { this._go(i, 'api'); }
+    next() { this._go(this._index + 1, 'api'); }
+    prev() { this._go(this._index - 1, 'api'); }
+    reset() { this._go(0, 'api'); }
+  }
+
+  if (!customElements.get('deck-stage')) {
+    customElements.define('deck-stage', DeckStage);
+  }
+})();
+
+</script>
+</head>
+<body>
+<deck-stage width="1280" height="720">
+
+  <!-- 01 Cover -->
+  <section data-screen-label="01 Kapak">
+    <div class="slide coral" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <img src="data:image/png;base64,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" style="position:absolute;right:-120px;top:-200px;height:1400px;opacity:.14;">
+      <div style="text-align:center;position:relative;">
+        <div style="font-family:var(--font-display);font-weight:300;font-size:15px;letter-spacing:.12em;color:#fff;opacity:.9;text-transform:uppercase;">Özdilekteyim × Inbound</div>
+        <h1 style="font-size:78px;color:#fff;margin-top:18px;">AI Trafik<br>Analizi</h1>
+        <p style="margin-top:20px;font-size:20px;color:#fff;opacity:.92;font-weight:400;">Yapay zeka kaynaklı referral trafiği · Kasım 2025 – Haziran 2026</p>
+      </div>
+      <img src="data:image/png;base64,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" style="position:absolute;bottom:56px;left:50%;transform:translateX(-50%);height:32px;">
+    </div>
+  </section>
+
+  <!-- 02 Agenda -->
+  <section data-screen-label="02 Akış">
+    <div class="slide" style="display:grid;grid-template-columns:45% 55%;">
+      <div style="background:var(--coral);color:#fff;padding:60px 50px;display:flex;flex-direction:column;justify-content:center;position:relative;">
+        <div style="font-family:var(--font-display);font-weight:300;font-size:13px;letter-spacing:.1em;opacity:.85;">SUNUM AKIŞI</div>
+        <div style="font-family:var(--font-display);font-weight:300;font-size:58px;letter-spacing:-.02em;line-height:1.05;margin-top:12px;">İçerik<br>Haritası</div>
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE8AAABOCAYAAABhaEsjAAAABHNCSVQICAgIfAhkiAAAA29JREFUeJztnEuCqyAUBS/ZWNMre2Rl4srOG6hpgwIX5CdYk5ioiBV+IiCoIQDIdVMau/S2IYTQ1Aii1oUBqHXzh46yOOj1801UR2oxeWuqkhQvy4emiiKzAEChPBOAqfa9R1NJ2hmqtgs2aEeaiartxgralbZnwl+N3ga4h7g99ctDALK2hQtMuJgKo5sqWMqQf1cu3gi/sU2bV8xJHYkjIppQqjLB/co3LnkFol9xG3kEon9xG2yBrAoDS61Uv3ovx1sIoXwHeeUNKG7DWwtz5E2UpxekeYQQTj/OnZnFaSKad9sfzv5xHBu0kpburW07B87sa5WXOLu+PxdklCUx4LsXOmWfIav8MyMzXa21QmquHGB5fLx6Hwi9aGyzpLowGxdFqpAL5Qu8MrESuYGHpDqV91bzESFRcQLsWppJiERfQJxAVJnbKgt4OU65AvDJs5/cAfDnvPOmm+dEVfY26uJKRLYTbPJGfK51CVTcg4cUt8F2YrEsy0e5LbxZ15JlZZ3otoXFjdofYCbPobOrCY7NGLXfacqT1WLaKGeJ6+zVo+5miFZa3qe/PqmOh1lpiO3H7QBf1/PImJ5eRkrTxWN0L/S2AUBGDbcYmHn/xZQ30wMX+aJBXysmQL/oKedC+Nl/MbPtDz2weZoqARyaKjUjcyesDw/Gs60qGqubYDiabDvC3pAPAI7dUl8dA7NxsCodwcaxj78+6a96OghWTlLd0c3JAcNnX4u4oxez3DsUjAPCdmLJusMKtIg7ZtndCTaGEuhISE55NtvuEzvBI+2QiEK7pCZ02oxBiilhHvOff6CnVMhIcbycFxDQ7SUG3qviBhrKrSQGSgMQ0OaNCbx1ies9RQ9UD73YVaqLvCjscx+28F2TWBSlm5CsaanJNVG+RWPwnUJSxd06B803fUoljISJXj9nip8+RZRvhSCiZejJr20nZ+LeqB0ETnFEvDUGnAF0zPnAnh1eeWsW8gbUGawVL1gvgNZZf6MIfGep0BJU+62jkksbRGBecR0LjBJ3ZTkkSX0s3BA+kzsFSDSTuiKyuLQTiVNtC4Go2s6+wH1SoartygrarUxUbTds0I5EVdtFNFiX3e1RWulFpomWLi5pPzIaTWv3VqkZTFVGgRoiieKXN5+J8q0S5KOpIbT4bndJY7cmamvp8v+hfB26NuGVeQAAAABJRU5ErkJggg==" style="position:absolute;left:44px;bottom:40px;width:36px;height:36px;">
+      </div>
+      <div style="padding:58px 56px;display:flex;flex-direction:column;justify-content:space-between;">
+        <div><div style="font-family:var(--font-body);font-weight:300;font-size:17px;color:var(--teal);opacity:.6;">01</div><div style="font-family:var(--font-display);font-weight:700;font-size:23px;color:var(--teal);">Genel Görünüm</div><div style="font-size:13px;color:var(--ink-2);">Hacim, ciro, dönüşüm ve aylık seyir</div></div>
+        <div><div style="font-family:var(--font-body);font-weight:300;font-size:17px;color:var(--teal);opacity:.6;">02</div><div style="font-family:var(--font-display);font-weight:700;font-size:23px;color:var(--teal);">Trafik Nereye Gidiyor</div><div style="font-size:13px;color:var(--ink-2);">Sayfa tipi, en değerli sayfalar, marka merceği</div></div>
+        <div><div style="font-family:var(--font-body);font-weight:300;font-size:17px;color:var(--teal);opacity:.6;">03</div><div style="font-family:var(--font-display);font-weight:700;font-size:23px;color:var(--teal);">Fırsat & llms.txt</div><div style="font-size:13px;color:var(--ink-2);">Dönüşmeyen sayfalar ve llms.txt etkisi</div></div>
+        <div><div style="font-family:var(--font-body);font-weight:300;font-size:17px;color:var(--teal);opacity:.6;">04</div><div style="font-family:var(--font-display);font-weight:700;font-size:23px;color:var(--teal);">Sonraki Adımlar</div><div style="font-size:13px;color:var(--ink-2);">Değerlendirilebilir aksiyon alanları</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Separator 01 -->
+  <section data-screen-label="03 Bölüm 01">
+    <div class="slide dark" style="display:flex;align-items:center;justify-content:center;">
+      <div style="position:absolute;left:-60px;bottom:-40px;font-family:var(--font-display);font-weight:700;font-size:500px;color:#1A4238;line-height:1;">01</div>
+      <div style="text-align:center;position:relative;">
+        <div class="accent-line" style="margin:0 auto 30px;"></div>
+        <h1 style="color:#fff;font-size:60px;">Genel Görünüm</h1>
+        <div class="accent-line" style="margin:30px auto 0;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 KPI -->
+  <section data-screen-label="04 KPI">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Genel Görünüm</span><span class="sep">|</span><span class="title">Tek bakışta tablo</span></div>
+      <div style="padding:88px 60px 24px;display:grid;grid-template-columns:34% 1fr;gap:44px;">
+        <div>
+          <h1 style="font-size:38px;">Tek bakışta <span class="hl">tablo</span></h1>
+          <p style="margin-top:16px;font-size:14px;color:var(--ink-2);">Kasım 2025 – Haziran 2026 döneminde yapay zeka kaynaklı (ağırlıkla ChatGPT) referral trafiğinin özeti. Rakamlar bağlamda değerlendirildiğinde dikkat çekmektedir.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v">38.237</div><div class="l">AI Oturum</div></div>
+          <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v">₺639<small>K</small></div><div class="l">Toplam Ciro</div></div>
+          <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v">251</div><div class="l">Transaction</div></div>
+          <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v">₺2.544</div><div class="l">AOV (işlem başına)</div></div>
+        </div>
+      </div>
+      <ul class="insight-list" style="padding:0 60px;margin-top:8px;column-count:2;column-gap:40px;">
+        <li>En yüksek oturum hacmi <b class="acc">Mayıs 2026</b> ayında (7.575 oturum) gözlemlenmektedir; dönüşüm oranı <b class="acc">%0,66</b> düzeyindedir.</li>
+        <li>Trafiğin büyük bölümü <b class="acc">ürün sayfalarına</b> yönelmekte, ciro tarafında ise sepet ve onay adımları öne çıkmaktadır.</li>
+      </ul>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 05 Aylık trend -->
+  <section data-screen-label="05 Aylık trend">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Genel Görünüm</span><span class="sep">|</span><span class="title">Aylık seyir</span></div>
+      <div style="padding:84px 60px 40px;">
+        <h1 style="font-size:34px;">Aylık AI trafik <span class="hl">eğrisi</span></h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;">Bar: aylık oturum · turuncu etiket: aylık ciro. Şubat 2026 ayında <span class="llms-badge">✦ llms.txt</span> eklenmiştir. Haziran taralı bar kısmi dönemi gösterir.</p>
+        <div class="bars">
+          <div class="col"><div class="val">5.264</div><div class="rev">₺139K</div><div class="bar" style="height:69.5%;"></div><div class="mon">Kas 25</div></div>
+          <div class="col"><div class="val">4.000</div><div class="rev">₺47K</div><div class="bar" style="height:52.8%;"></div><div class="mon">Ara 25</div></div>
+          <div class="col"><div class="val">4.703</div><div class="rev">₺38K</div><div class="bar" style="height:62.1%;"></div><div class="mon">Oca 26</div></div>
+          <div class="col"><div class="val">3.578</div><div class="rev">₺56K</div><div class="bar" style="height:47.2%;border-top:3px solid var(--teal);"></div><div class="mon" style="color:var(--coral-deep);font-weight:700;">Şub 26 ✦</div></div>
+          <div class="col"><div class="val">4.762</div><div class="rev">₺65K</div><div class="bar" style="height:62.9%;"></div><div class="mon">Mar 26</div></div>
+          <div class="col"><div class="val">4.988</div><div class="rev">₺90K</div><div class="bar" style="height:65.8%;"></div><div class="mon">Nis 26</div></div>
+          <div class="col"><div class="val">7.575</div><div class="rev">₺122K</div><div class="bar" style="height:100%;"></div><div class="mon">May 26</div></div>
+          <div class="col"><div class="val">3.367</div><div class="rev">₺82K</div><div class="bar partial" style="height:44.4%;"></div><div class="mon">Haz 26*</div></div>
+        </div>
+      </div>
+      <ul class="insight-list" style="padding:0 60px;margin-top:0;column-count:2;column-gap:40px;">
+        <li>Kasım'dan Mayıs'a oturum hacminde <b class="pos">genel bir yükseliş</b> eğilimi gözlemlenmektedir.</li>
+        <li>Haziran <b class="acc">kısmi dönem</b> olduğundan ay sonu değerleri farklılaşabilir; karşılaştırma buna göre yorumlanabilir.</li>
+      </ul>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 06 Separator 02 -->
+  <section data-screen-label="06 Bölüm 02">
+    <div class="slide dark" style="display:flex;align-items:center;justify-content:center;">
+      <div style="position:absolute;left:-60px;bottom:-40px;font-family:var(--font-display);font-weight:700;font-size:500px;color:#1A4238;line-height:1;">02</div>
+      <div style="text-align:center;position:relative;">
+        <div class="accent-line" style="margin:0 auto 30px;"></div>
+        <h1 style="color:#fff;font-size:60px;">Trafik Nereye Gidiyor</h1>
+        <div class="accent-line" style="margin:30px auto 0;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 Sayfa tipi -->
+  <section data-screen-label="07 Sayfa tipi">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Trafik Nereye Gidiyor</span><span class="sep">|</span><span class="title">Sayfa tipi dağılımı</span></div>
+      <div style="padding:84px 60px 70px;">
+        <h1 style="font-size:34px;">Sayfa tipine göre <span class="hl">dağılım</span></h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;max-width:760px;">AI oturumlarının ve cironun sayfa tipine göre kırılımı. Renklendirme oturum payına göre hücre düzeyinde uygulanmıştır.</p>
+        <div style="display:grid;grid-template-columns:60% 1fr;gap:36px;margin-top:22px;">
+          <table class="ptbl">
+            <thead><tr><th>Sayfa Tipi</th><th class="n">Oturum</th><th class="n">Pay</th><th class="n">Ciro</th><th class="n">Transaction</th></tr></thead>
+            <tbody>
+              <tr><td>Ürün</td><td class="n">29.328</td><td class="n" style="background:#FFCDD2;color:#B23;font-family:var(--font-display);font-weight:700;">%76,7</td><td class="n">₺460.842</td><td class="n">187</td></tr>
+              <tr><td>Market</td><td class="n">7.193</td><td class="n" style="background:#FFE3D8;font-weight:700;">%18,8</td><td class="n">₺10.642</td><td class="n">9</td></tr>
+              <tr><td>Kategori</td><td class="n">952</td><td class="n">%2,5</td><td class="n" style="background:#C8E6C9;color:#2E7D32;font-family:var(--font-display);font-weight:700;">₺109.758</td><td class="n">40</td></tr>
+              <tr><td>Sepet / Checkout</td><td class="n">235</td><td class="n">%0,6</td><td class="n">₺49.730</td><td class="n">13</td></tr>
+              <tr><td>Anasayfa</td><td class="n">173</td><td class="n">%0,5</td><td class="n">₺0</td><td class="n">0</td></tr>
+              <tr><td>Marka</td><td class="n">162</td><td class="n">%0,4</td><td class="n">₺0</td><td class="n">0</td></tr>
+            </tbody>
+          </table>
+          <ul class="insight-list">
+            <li>AI trafiğinin <b class="acc">%76,7</b>'si ürün sayfalarına yönelmektedir; kanalın ürün keşfi odaklı çalıştığı değerlendirilebilir.</li>
+            <li>Kategori sayfaları oturumun yalnızca <b class="acc">%2,5</b>'ini oluştururken ciroda <b class="pos">₺109.758</b> ile öne çıkmakta, oturum başına değeri yüksek görünmektedir.</li>
+            <li>Market sayfaları hacimli (<b class="acc">%18,8</b>) fakat ciro katkısı görece sınırlıdır.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 08 En değerli sayfalar -->
+  <section data-screen-label="08 En değerli sayfalar">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Trafik Nereye Gidiyor</span><span class="sep">|</span><span class="title">En değerli sayfalar</span></div>
+      <div style="padding:84px 60px 50px;">
+        <h1 style="font-size:34px;">En değerli <span class="hl">sayfalar</span></h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;">Üç ayrı perspektiften öne çıkan sayfalar. <span class="llms-badge">✦ llms.txt</span> işareti ilgili listede yer alan sayfaları gösterir.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:22px;">
+          <div class="col-card">
+            <h4><span class="tag">En çok oturum</span>Trafik</h4>
+            <ul class="minilist">
+              <li><span class="nm">philips su arıtma</span><span class="vv">317</span></li>
+              <li><span class="nm">/magaza</span><span class="vv">235</span></li>
+              <li><span class="nm">sjcam aksiyon kamera</span><span class="vv">195</span></li>
+              <li><span class="nm">anasayfa</span><span class="vv">173</span></li>
+              <li><span class="nm">özdilek point seti</span><span class="vv">98</span></li>
+            </ul>
+          </div>
+          <div class="col-card">
+            <h4><span class="tag">En çok ciro · ürün</span>Ciro</h4>
+            <ul class="minilist">
+              <li><span class="nm">fissler vitavit prem.</span><span class="vv">₺20,0K</span></li>
+              <li><span class="nm">fissler vitaquick</span><span class="vv">₺16,0K</span></li>
+              <li><span class="nm">fissler vitavit mat</span><span class="vv">₺14,0K</span></li>
+              <li><span class="nm">özdilek pike takımı</span><span class="vv">₺11,9K</span></li>
+              <li><span class="nm">stanley termos</span><span class="vv">₺5,1K</span></li>
+            </ul>
+          </div>
+          <div class="col-card">
+            <h4><span class="tag">En çok işlem · ürün</span>Transaction</h4>
+            <ul class="minilist">
+              <li><span class="nm">stanley termos</span><span class="vv">3</span></li>
+              <li><span class="nm">sjcam kamera</span><span class="vv">2</span></li>
+              <li><span class="nm">fissler serisi</span><span class="vv">1+</span></li>
+              <li><span class="nm">özdilek pike</span><span class="vv">1</span></li>
+              <li><span class="nm">market ürünleri</span><span class="vv">1+</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <ul class="insight-list" style="padding:0 60px;">
+        <li>Cironun önemli bölümü <b class="acc">sepet ve onay adımlarında</b> toplanmakta; ürün düzeyinde <b class="acc">Fissler düdüklü tencere</b> serisi ve <b class="acc">Stanley termos</b> öne çıkmaktadır.</li>
+      </ul>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 09 Marka merceği -->
+  <section data-screen-label="09 Marka">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Trafik Nereye Gidiyor</span><span class="sep">|</span><span class="title">Marka merceği</span></div>
+      <div style="padding:84px 60px 50px;display:grid;grid-template-columns:1fr 34%;gap:44px;">
+        <div>
+          <h1 style="font-size:34px;">Marka <span class="hl">merceği</span></h1>
+          <p style="font-size:13px;color:var(--ink-2);margin:8px 0 22px;">Oturuma göre öne çıkan markalar (ürün slug ve marka sayfalarından türetilmiştir).</p>
+          <div class="bbar-row"><span class="nm">Özdilek</span><span class="track"><span class="fill" style="width:100%;"></span></span><span class="vv">1.823</span></div>
+          <div class="bbar-row"><span class="nm">Mavi</span><span class="track"><span class="fill" style="width:71%;"></span></span><span class="vv">1.299</span></div>
+          <div class="bbar-row"><span class="nm">Adidas</span><span class="track"><span class="fill" style="width:68%;"></span></span><span class="vv">1.232</span></div>
+          <div class="bbar-row"><span class="nm">Skechers</span><span class="track"><span class="fill" style="width:48%;"></span></span><span class="vv">867</span></div>
+          <div class="bbar-row"><span class="nm">Philips</span><span class="track"><span class="fill" style="width:46%;"></span></span><span class="vv">847</span></div>
+          <div class="bbar-row"><span class="nm">Pierre Cardin</span><span class="track"><span class="fill" style="width:33%;"></span></span><span class="vv">610</span></div>
+          <div class="bbar-row"><span class="nm">Calvin Klein</span><span class="track"><span class="fill" style="width:32%;"></span></span><span class="vv">588</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:center;">
+          <ul class="insight-list">
+            <li><b class="acc">Özdilek</b> kendi markalı ürünleriyle en yüksek AI oturumunu almaktadır.</li>
+            <li>Moda tarafında <b class="acc">Mavi, Adidas, Skechers</b>; elektronik tarafında <b class="acc">Philips</b> öne çıkmaktadır.</li>
+            <li>Marka kapsamının ürün slug sözlüğü genişletilerek derinleştirilmesi değerlendirilebilir.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 09b Zaman içinde yükselenler -->
+  <section data-screen-label="Yükselenler">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Trafik Nereye Gidiyor</span><span class="sep">|</span><span class="title">Zaman içinde yükselenler</span></div>
+      <div style="padding:84px 60px 50px;">
+        <h1 style="font-size:34px;">Zaman içinde <span class="hl">yükselenler</span></h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;">Dönemin ilk yarısı (Kas–Şub) ile ikinci yarısı (Mar–Haz) arasındaki AI oturum artışı.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-top:24px;">
+          <div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--coral-deep);margin-bottom:14px;">Yükselen markalar · Δ oturum</div>
+            <div class="bbar-row"><span class="nm">Özdilek</span><span class="track"><span class="fill" style="width:100%;"></span></span><span class="vv">+391</span></div>
+            <div class="bbar-row"><span class="nm">Adidas</span><span class="track"><span class="fill" style="width:77%;"></span></span><span class="vv">+300</span></div>
+            <div class="bbar-row"><span class="nm">Skechers</span><span class="track"><span class="fill" style="width:71%;"></span></span><span class="vv">+277</span></div>
+            <div class="bbar-row"><span class="nm">SJCAM</span><span class="track"><span class="fill" style="width:63%;"></span></span><span class="vv">+247</span></div>
+            <div class="bbar-row"><span class="nm">Philips</span><span class="track"><span class="fill" style="width:63%;"></span></span><span class="vv">+247</span></div>
+            <div class="bbar-row"><span class="nm">New Balance</span><span class="track"><span class="fill" style="width:49%;"></span></span><span class="vv">+190</span></div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--coral-deep);margin-bottom:14px;">Yükselen sayfalar / ürünler · Δ oturum</div>
+            <ul class="minilist">
+              <li><span class="nm">philips su arıtma cihazı</span><span class="vv">+211</span></li>
+              <li><span class="nm">sjcam aksiyon kamera</span><span class="vv">+193</span></li>
+              <li><span class="nm">anasayfa</span><span class="vv">+153</span></li>
+              <li><span class="nm">özdilek point happy aile seti</span><span class="vv">+52</span></li>
+              <li><span class="nm">acton pocket camera gimbal</span><span class="vv">+44</span></li>
+            </ul>
+            <ul class="insight-list" style="margin-top:18px;">
+              <li><b class="acc">Özdilek, Adidas ve Skechers</b> ikinci yarıda en belirgin oturum artışını göstermektedir.</li>
+              <li>Elektronik tarafında <b class="acc">Philips ve SJCAM</b> öne çıkmakta; kamera ürünleri yeni ilgi çekmektedir.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 10 Separator 03 -->
+  <section data-screen-label="10 Bölüm 03">
+    <div class="slide dark" style="display:flex;align-items:center;justify-content:center;">
+      <div style="position:absolute;left:-60px;bottom:-40px;font-family:var(--font-display);font-weight:700;font-size:500px;color:#1A4238;line-height:1;">03</div>
+      <div style="text-align:center;position:relative;">
+        <div class="accent-line" style="margin:0 auto 30px;"></div>
+        <h1 style="color:#fff;font-size:60px;">Fırsat & llms.txt</h1>
+        <div class="accent-line" style="margin:30px auto 0;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 Dönüşmeyen sayfalar -->
+  <section data-screen-label="11 Dönüşmeyen">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Fırsat & llms.txt</span><span class="sep">|</span><span class="title">Dönüşmeyen sayfalar</span></div>
+      <div style="padding:84px 60px 70px;">
+        <h1 style="font-size:34px;">AI oturumu yüksek, <span class="hl">dönüşmeyen</span> sayfalar</h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;max-width:780px;">Belirgin AI oturumu alan fakat henüz transaction ile sonuçlanmayan sayfalar. İçerik ve dönüşüm akışının gözden geçirilmesiyle değerlendirilebilir fırsat alanı sunmaktadır.</p>
+        <div style="display:grid;grid-template-columns:58% 1fr;gap:36px;margin-top:22px;">
+          <table class="ptbl">
+            <thead><tr><th>Sayfa</th><th>Tip</th><th class="n">Oturum</th><th class="n">İşlem</th></tr></thead>
+            <tbody>
+              <tr><td>philips su arıtma cihazı</td><td>Ürün</td><td class="n">317</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+              <tr><td>anasayfa</td><td>Anasayfa</td><td class="n">173</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+              <tr><td>özdilek point happy aile seti</td><td>Ürün</td><td class="n">98</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+              <tr><td>philips hava temizleme cihazı</td><td>Ürün</td><td class="n">67</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+              <tr><td>acton pocket camera gimbal</td><td>Ürün</td><td class="n">62</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+              <tr><td>acton selfie aksiyon kamerası</td><td>Ürün</td><td class="n">54</td><td class="n" style="background:#FFE3D8;font-weight:700;">0</td></tr>
+            </tbody>
+          </table>
+          <ul class="insight-list">
+            <li><b class="acc">Philips</b> ürün sayfaları yüksek ilgi görmekte fakat işleme dönüşmemektedir; fiyat, stok ve içerik bütünlüğü değerlendirilebilir.</li>
+            <li><b class="acc">Acton</b> kamera ürünleri tekrarlı şekilde listede yer almakta, bu ürün grubu için ayrı bir bakış faydalı olabilir.</li>
+            <li>Anasayfa girişlerinin ilgili kategori ve ürünlere yönlendirme akışı gözden geçirilebilir.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · AI referral</div>
+    </div>
+  </section>
+
+  <!-- 12 llms.txt etkisi -->
+  <section data-screen-label="12 llms.txt">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Fırsat & llms.txt</span><span class="sep">|</span><span class="title">llms.txt etkisi</span></div>
+      <div style="padding:84px 60px 50px;">
+        <h1 style="font-size:34px;">llms.txt <span class="hl">etkisi</span></h1>
+        <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;max-width:830px;">llms.txt dosyası Şubat 2026'da eklenmiştir; "Önemli Sayfalar" altında 83 sayfa tanımlıdır, bunlardan 62'si AI trafiği verisinde gözlemlenmektedir. Aşağıda Şubat öncesi ve sonrası AI oturum karşılaştırması yer almaktadır.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-top:26px;align-items:center;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="kpi-card" style="background:var(--coral);color:#fff;"><div class="v" style="font-size:40px;">37 → 40</div><div class="l">llms.txt sayfaları · doğrudan oturum (Şubat öncesi → sonrası)</div></div>
+            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:40px;">~38K</div><div class="l">İlişkili ürün keşfi · oturum (yaklaşık, örtüşmeli)</div></div>
+            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:40px;">13.930</div><div class="l">Diğer sayfalar · Şubat öncesi</div></div>
+            <div class="kpi-card" style="background:var(--teal);color:#fff;"><div class="v" style="font-size:40px;">24.230</div><div class="l">Diğer sayfalar · Şubat sonrası</div></div>
+          </div>
+          <ul class="insight-list">
+            <li>llms.txt sayfaları ağırlıkla <b class="acc">kategori/marka</b> niteliğindedir; bu sayfaların doğrudan AI oturumu bu dönemde sınırlı seyretmektedir (<b class="acc">37 → 40</b>).</li>
+            <li>Buna karşın bu kategori ve markalardaki <b class="acc">ürünlere gelen ilişkili trafik daha geniş bir hacme</b> (yaklaşık 38K oturum, örtüşmeli) işaret etmektedir; kullanıcıların kategori yerine doğrudan ilgili ürün sayfalarına ulaşmış olabileceği değerlendirilebilir.</li>
+            <li>llms.txt etkisinin daha sağlıklı ölçülebilmesi için kapsamın <b class="acc">öne çıkan ürün sayfalarıyla</b> genişletilmesi ve takibin sürdürülmesi değerlendirilebilir.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+      <div class="source-pill">Kaynak: GA4 · llms.txt</div>
+    </div>
+  </section>
+
+  <!-- 13 Sonraki adımlar -->
+  <section data-screen-label="13 Sonraki adımlar">
+    <div class="slide">
+      <div class="breadcrumb-top"><span class="section">Sonraki Adımlar</span><span class="sep">|</span><span class="title">Değerlendirilebilir alanlar</span></div>
+      <div style="padding:84px 60px 60px;">
+        <h1 style="font-size:34px;">Sonraki <span class="hl">adımlar</span></h1>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px;">
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">01</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">Dönüşüm akışı</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">Yüksek AI oturumu alan ürün sayfalarında fiyat, stok ve içerik bütünlüğünün değerlendirilmesi.</p></div>
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">02</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">llms.txt kapsamı</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">Öne çıkan ürün sayfalarının llms.txt kapsamına eklenmesi ve etkisinin zaman içinde takibi.</p></div>
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">03</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">Arama hacmi & sezonsallık</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">İlgili kategori ve markaların güncel arama hacmiyle zenginleştirilmesi (opsiyonel aşama).</p></div>
+          <div class="col-card"><div style="font-family:var(--font-display);font-weight:700;font-size:44px;color:var(--coral);opacity:.2;">04</div><div style="font-family:var(--font-display);font-weight:700;font-size:18px;margin-top:-8px;">Sürekli takip</div><p style="font-size:13px;color:var(--ink-2);margin-top:6px;">Aylık AI trafik raporunun düzenli güncellenmesi ve kanal performansının izlenmesi.</p></div>
+        </div>
+      </div>
+      <div class="logo-bl"></div>
+    </div>
+  </section>
+
+  <!-- 14 Kapanış -->
+  <section data-screen-label="14 Kapanış">
+    <div class="slide coral" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <img src="data:image/png;base64,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" style="position:absolute;left:-140px;top:-100px;height:1200px;opacity:.14;">
+      <div style="text-align:center;position:relative;">
+        <div class="accent-line" style="background:#fff;margin:0 auto 30px;"></div>
+        <h1 style="font-family:var(--font-display);font-weight:300;font-size:96px;color:#fff;letter-spacing:-.02em;">Teşekkürler</h1>
+        <div class="accent-line" style="background:#fff;margin:30px auto 0;"></div>
+        <div style="font-family:var(--font-body);font-size:16px;color:#fff;opacity:.9;margin-top:38px;">welcome@inbound.com.tr</div>
+        <div style="font-family:var(--font-body);font-size:11px;color:#fff;opacity:.7;margin-top:8px;letter-spacing:.04em;">Özdilekteyim × Inbound · AI Trafik Analizi · © 2026 Inbound</div>
+      </div>
+    </div>
+  </section>
+
+</deck-stage>
+</body>
+</html>

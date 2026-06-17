@@ -44,6 +44,11 @@
     const brands = AU.groupBy(rows.filter(r=>r.brand),r=>r.brand).sort((a,b)=>b.sessions-a.sessions).slice(0,5);
     const noconv = groupLP(rows).filter(x=>x.tx===0 && x.ptype!=='Sepet/Checkout' && x.ptype!=='Hesap' && x.sessions>=5).sort((a,b)=>b.sessions-a.sessions).slice(0,5);
     const llmsN = AU.META.llmsInData;
+    // zaman içinde yükselenler (dönemin ilk yarısı → ikinci yarısı, tüm aylar üzerinden)
+    const mLbl = AU.momentumLabels();
+    const riseLp = AU.momentum(allRows, r=>r.lp).filter(x=>x.diff>0).slice(0,5);
+    const riseBrand = AU.momentum(allRows, r=>r.brand).filter(x=>x.diff>0).slice(0,5);
+    const riseProd = AU.momentum(allRows, r=>r.lp, r=>r.ptype==='Ürün').filter(x=>x.diff>0).slice(0,5);
     return h('div', null,
       h(KpiStrip, { items:kpis, cols:5 }),
       h('div', { className:'insight-strip', style:{marginBottom:'18px'} }, h('span',{className:'arrow'},'➜'),
@@ -70,6 +75,16 @@
           rows: noconv.map(x=>({nm:AU.lpLabel(x.lp), vv:U.fmtFull(x.sessions)})) }),
         h(SummaryCard, { title:'llms.txt etkisi', goLabel:'llms.txt Etkisi', onGo:()=>navTo('llms'),
           rows:[ {nm:'Listede tanımlı sayfa', vv:AU.META.llmsPathCount}, {nm:'Veride görünen', vv:llmsN}, {nm:'llms.txt eklendi', vv:AU.trMonth(AU.META.llmsAddedMonth)} ] })
+      ),
+      h('div', { style:{margin:'22px 0 14px', fontSize:'13px', fontWeight:700, color:'var(--ink-2)'} },
+        'Zaman içinde yükselenler ', h('span',{style:{fontWeight:500,color:'var(--ink-3)',fontSize:'12px'}}, '· '+mLbl.early[0]+'–'+mLbl.early[mLbl.early.length-1]+' → '+mLbl.late[0]+'–'+mLbl.late[mLbl.late.length-1]+' oturum artışı')),
+      h('div', { className:'summary-grid', style:{gridTemplateColumns:'repeat(3,1fr)'} },
+        h(SummaryCard, { title:'Yükselen Landing Page', goLabel:'Landing Page', onGo:()=>navTo('lp'),
+          rows: riseLp.map(x=>({nm:AU.lpLabel(x.key), vv:'+'+U.fmtFull(x.diff)})) }),
+        h(SummaryCard, { title:'Yükselen Markalar', goLabel:'Marka & Ürün', onGo:()=>navTo('brand'),
+          rows: riseBrand.map(x=>({nm:x.key, vv:'+'+U.fmtFull(x.diff)})) }),
+        h(SummaryCard, { title:'Yükselen Ürünler', goLabel:'Landing Page', onGo:()=>navTo('lp',{ptypes:['Ürün']}),
+          rows: riseProd.map(x=>({nm:AU.lpLabel(x.key), vv:'+'+U.fmtFull(x.diff)})) })
       )
     );
   }
