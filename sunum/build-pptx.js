@@ -195,5 +195,5 @@ s.addText('Teşekkürler',{x:0,y:2.7,w:W,h:1.4,fontFace:HF,fontSize:60,bold:true
 s.addText('welcome@inbound.com.tr',{x:0,y:4.2,w:W,h:0.4,fontFace:BF,fontSize:16,color:WHITE,align:'center'});
 s.addText('Özdilekteyim × Inbound · AI Trafik Analizi · © 2026 Inbound',{x:0,y:4.65,w:W,h:0.35,fontFace:BF,fontSize:11,color:WHITE,align:'center'});
 
-const OUT = path.join(__dirname, 'Ozdilekteyim-AI-Trafik-Analizi-Sunum.pptx');
+const OUT = path.join(__dirname, 'Ozdilekteyim-AI-Trafik-Analizi-Sunum-editable.pptx');
 p.writeFile({ fileName: OUT }).then(()=>console.log('✓ PPTX yazıldı:', OUT));
